@@ -1,18 +1,19 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8">
   <title>Amazon PPC Bid Adjustment Optimizer</title>
   <style>
     /* ---------- Base Layout & Theme ---------- */
     :root {
-      --bg-gradient: radial-gradient(circle at top left, #eef2ff 0, #f9fafb 35%, #fdf2ff 80%);
+      --bg-gradient: radial-gradient(circle at 30% 20%, #eef2ff 0, #f9fafb 35%, #fdf2ff 80%);
       --card-bg: rgba(255, 255, 255, 0.96);
       --border-subtle: rgba(148, 163, 184, 0.35);
       --text-main: #0f172a;
       --text-muted: #6b7280;
       --accent: #6366f1;
-      --accent-soft: #e0e7ff;
+      --accent-soft: #eef2ff;
       --accent-strong: #4f46e5;
       --danger-soft: #fef2f2;
       --danger: #b91c1c;
@@ -21,7 +22,7 @@
       --shadow-soft: 0 18px 45px rgba(15, 23, 42, 0.12);
       --radius-lg: 18px;
       --radius-pill: 999px;
-      --transition-fast: 0.18s ease-out;
+      --transition-fast: 0.3s ease-out;
     }
 
     * {
@@ -29,11 +30,19 @@
     }
 
     body {
-      font-family: system-ui, -apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", sans-serif;
+      font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
       background: var(--bg-gradient);
+      background-size: 120% 120%;
+      animation: gradient-shift 20s ease-in-out infinite alternate;
       margin: 0;
       padding: 32px 16px 40px;
       color: var(--text-main);
+    }
+
+    @keyframes gradient-shift {
+      to {
+        background-position: 70% 80%;
+      }
     }
 
     .app-shell {
@@ -47,89 +56,105 @@
       align-items: flex-start;
       justify-content: space-between;
       gap: 16px;
-      margin-bottom: 20px;
+      margin-bottom: 24px;
     }
 
     .title-block h1 {
-      font-size: 28px;
-      letter-spacing: -0.03em;
-      margin: 0 0 6px;
+      font-size: 32px;
+      font-weight: 700;
+      letter-spacing: -0.04em;
+      margin: 0 0 8px;
       display: flex;
       align-items: center;
-      gap: 10px;
+      gap: 12px;
     }
 
     .title-pill {
-      font-size: 11px;
+      font-size: 10px;
       padding: 3px 9px;
       border-radius: var(--radius-pill);
       background: rgba(15, 23, 42, 0.06);
       color: #4b5563;
       text-transform: uppercase;
-      letter-spacing: .12em;
+      letter-spacing: .15em;
+      opacity: 0.6;
     }
 
     .subtitle {
       margin: 0;
       color: var(--text-muted);
       font-size: 13px;
-      line-height: 1.5;
+      line-height: 1.6;
     }
 
     .steps-row {
       display: flex;
       flex-wrap: wrap;
-      gap: 8px;
-      margin-top: 10px;
+      gap: 10px;
+      margin-top: 16px;
+      position: relative;
     }
 
     .step-chip {
       display: inline-flex;
       align-items: center;
-      gap: 6px;
-      padding: 4px 10px;
+      gap: 8px;
+      padding: 6px 12px;
       border-radius: var(--radius-pill);
       background: rgba(255, 255, 255, 0.7);
       border: 1px solid rgba(148, 163, 184, 0.4);
       font-size: 11px;
       color: #4b5563;
+      transition: all var(--transition-fast);
+    }
+
+    .step-chip:hover {
+      background: rgba(255, 255, 255, 0.95);
+      border-color: var(--accent);
     }
 
     .step-badge {
-      width: 18px;
-      height: 18px;
+      width: 22px;
+      height: 22px;
       border-radius: 999px;
       background: var(--accent);
       color: white;
-      font-size: 11px;
+      font-size: 12px;
       display: inline-flex;
       align-items: center;
       justify-content: center;
-      font-weight: 600;
+      font-weight: 700;
     }
 
     /* ---------- Cards ---------- */
     .card {
       background: var(--card-bg);
       border-radius: var(--radius-lg);
-      padding: 18px 18px 20px;
+      padding: 24px;
       box-shadow: var(--shadow-soft);
       border: 1px solid var(--border-subtle);
-      margin-bottom: 18px;
+      margin-bottom: 24px;
       backdrop-filter: blur(14px);
+      transition: all var(--transition-fast);
+    }
+
+    .card.card-active {
+      box-shadow: 0 24px 60px rgba(15, 23, 42, 0.16);
+      border-left: 2px solid var(--accent);
     }
 
     .card-header {
       display: flex;
       align-items: center;
       justify-content: space-between;
-      margin-bottom: 8px;
+      margin-bottom: 12px;
       gap: 8px;
     }
 
     .card-title {
-      font-size: 15px;
-      font-weight: 600;
+      font-size: 16px;
+      font-weight: 650;
+      letter-spacing: -0.01em;
       display: flex;
       align-items: center;
       gap: 8px;
@@ -153,9 +178,10 @@
     }
 
     .card-subtitle {
-      font-size: 12px;
+      font-size: 13px;
       color: var(--text-muted);
-      margin-bottom: 8px;
+      margin-bottom: 12px;
+      line-height: 1.5;
     }
 
     /* ---------- File input & helper text ---------- */
@@ -167,38 +193,49 @@
     }
 
     input[type="file"] {
-      padding: 7px 10px;
-      font-size: 13px;
+      padding: 8px 12px;
+      font-size: 14px;
       border-radius: 9px;
-      border: 1px dashed rgba(148, 163, 184, 0.8);
+      border: 2px dashed rgba(148, 163, 184, 0.8);
       background: rgba(249, 250, 251, 0.9);
       cursor: pointer;
-      transition: border-color var(--transition-fast), background var(--transition-fast), box-shadow var(--transition-fast);
+      transition: all var(--transition-fast);
     }
 
     input[type="file"]:hover {
       border-color: var(--accent);
       background: white;
-      box-shadow: 0 0 0 1px rgba(129, 140, 248, 0.25);
+      box-shadow: 0 0 0 4px rgba(129, 140, 248, 0.08);
+      transform: translateY(-1px);
     }
 
     .hint {
-      font-size: 12px;
+      font-size: 13px;
       color: var(--text-muted);
+      line-height: 1.4;
     }
 
     .loading {
-      font-size: 12px;
+      font-size: 13px;
       color: var(--text-muted);
-      margin-top: 8px;
+      margin-top: 12px;
       display: flex;
       align-items: center;
-      gap: 6px;
+      gap: 8px;
+      opacity: 0;
+      max-height: 0;
+      overflow: hidden;
+      transition: opacity var(--transition-fast), max-height var(--transition-fast);
+    }
+
+    .loading[style*="flex"] {
+      opacity: 1;
+      max-height: 40px;
     }
 
     .loading-dot {
-      width: 10px;
-      height: 10px;
+      width: 12px;
+      height: 12px;
       border-radius: 999px;
       border: 2px solid rgba(148, 163, 184, 0.5);
       border-top-color: var(--accent);
@@ -206,132 +243,302 @@
     }
 
     @keyframes spin {
-      to { transform: rotate(360deg); }
+      to {
+        transform: rotate(360deg);
+      }
     }
 
     .error {
       margin-top: 12px;
-      padding: 10px 12px;
+      padding: 12px 16px;
       border-radius: 10px;
       background: var(--danger-soft);
       color: var(--danger);
-      font-size: 12px;
+      font-size: 13px;
       border: 1px solid rgba(248, 113, 113, 0.5);
+      line-height: 1.5;
     }
 
     .stats {
-      margin-top: 10px;
-      font-size: 13px;
+      margin-top: 12px;
+      font-size: 14px;
       color: #111827;
+      line-height: 1.5;
     }
 
     .stats strong {
       color: var(--accent-strong);
+      font-weight: 600;
     }
 
     .sheet-used {
-      margin-top: 4px;
+      margin-top: 8px;
       font-size: 11px;
       color: var(--text-muted);
+      letter-spacing: 0.02em;
     }
 
     .product-summary {
-      margin-top: 12px;
-      font-size: 12px;
+      margin-top: 16px;
+      font-size: 13px;
       color: #111827;
+      line-height: 1.6;
     }
 
     .product-summary span {
       display: inline-block;
       margin-right: 8px;
-      margin-bottom: 4px;
-      padding: 3px 9px;
+      margin-bottom: 6px;
+      padding: 4px 10px;
       border-radius: var(--radius-pill);
       background: #eef2ff;
       color: #4338ca;
       font-size: 11px;
+      font-weight: 500;
     }
 
     /* ---------- CVR Inputs ---------- */
     .cvr-row {
       display: flex;
       align-items: center;
-      gap: 8px;
-      margin-bottom: 8px;
+      gap: 12px;
+      margin-bottom: 12px;
       flex-wrap: wrap;
-      padding: 4px 0;
+      padding: 10px 0;
     }
 
     .cvr-label {
       min-width: 220px;
-      font-size: 13px;
+      font-size: 14px;
       color: #111827;
       font-weight: 500;
     }
 
     .cvr-input {
-      width: 110px;
-      padding: 6px 8px;
-      font-size: 13px;
+      width: 120px;
+      padding: 8px 12px;
+      font-size: 14px;
       border-radius: 8px;
       border: 1px solid rgba(148, 163, 184, 0.8);
       outline: none;
-      transition: border-color var(--transition-fast), box-shadow var(--transition-fast), background var(--transition-fast);
+      transition: all var(--transition-fast);
       background: rgba(249, 250, 251, 0.95);
     }
 
     .cvr-input:focus {
       border-color: var(--accent-strong);
-      box-shadow: 0 0 0 1px rgba(129, 140, 248, 0.25);
+      box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.12);
       background: white;
+      transform: scale(1.01);
     }
 
     /* ---------- Buttons ---------- */
     .btn-primary {
-      margin-top: 10px;
-      padding: 8px 18px;
+      margin-top: 16px;
+      padding: 10px 20px;
       border-radius: var(--radius-pill);
       border: none;
       cursor: pointer;
-      background: radial-gradient(circle at top left, #4f46e5 0, #1f2937 100%);
+      background: linear-gradient(135deg, #5b21b6 0%, #4f46e5 100%);
       color: #f9fafb;
-      font-size: 13px;
-      font-weight: 500;
-      letter-spacing: .01em;
+      font-size: 14px;
+      font-weight: 600;
+      letter-spacing: 0.01em;
       display: inline-flex;
       align-items: center;
-      gap: 6px;
-      box-shadow: 0 12px 30px rgba(15, 23, 42, 0.45);
-      transition: transform var(--transition-fast), box-shadow var(--transition-fast), opacity var(--transition-fast), filter var(--transition-fast);
+      gap: 8px;
+      box-shadow: 0 8px 24px rgba(15, 23, 42, 0.24);
+      transition: all var(--transition-fast);
     }
 
     .btn-primary:hover:not(:disabled) {
-      transform: translateY(-1px);
-      box-shadow: 0 18px 40px rgba(15, 23, 42, 0.6);
+      transform: translateY(-2px);
+      box-shadow: 0 12px 32px rgba(15, 23, 42, 0.32);
       filter: brightness(1.05);
+    }
+
+    .btn-primary:active:not(:disabled) {
+      transform: translateY(0px);
+      box-shadow: 0 4px 12px rgba(15, 23, 42, 0.3);
     }
 
     .btn-primary:disabled {
       opacity: 0.6;
-      cursor: default;
+      cursor: not-allowed;
       box-shadow: none;
     }
 
     .btn-primary small {
       font-size: 11px;
-      opacity: 0.8;
+      opacity: 0.85;
+      font-weight: 400;
+    }
+
+    .btn-primary.btn-pulse {
+      animation: pulse-once 1.2s ease-out;
+    }
+
+    @keyframes pulse-once {
+
+      0%,
+      100% {
+        box-shadow: 0 8px 24px rgba(15, 23, 42, 0.24);
+      }
+
+      50% {
+        box-shadow: 0 8px 32px rgba(99, 102, 241, 0.4);
+      }
     }
 
     .cvr-status {
-      margin-top: 8px;
-      font-size: 12px;
+      margin-top: 12px;
+      font-size: 13px;
+      line-height: 1.5;
+    }
+
+    /* ---------- Conversion File Upload ---------- */
+    .cvr-upload-section {
+      margin-bottom: 24px;
+      padding: 16px;
+      background: linear-gradient(135deg, #f0fdf4 0%, #ecfdf5 100%);
+      border-radius: 12px;
+      border: 2px dashed rgba(16, 185, 129, 0.4);
+      border-left: 2px solid #10b981;
+    }
+
+    .cvr-upload-section .section-title {
+      font-size: 14px;
+      font-weight: 600;
+      color: #059669;
+      margin-bottom: 8px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .cvr-upload-section .section-hint {
+      font-size: 11px;
+      color: #6b7280;
+      margin-bottom: 12px;
+      line-height: 1.5;
+      letter-spacing: 0.02em;
+    }
+
+    .cvr-upload-result {
+      margin-top: 12px;
+      padding: 12px 14px;
+      border-radius: 8px;
+      font-size: 13px;
+      line-height: 1.5;
+    }
+
+    .cvr-upload-result.success {
+      background: linear-gradient(135deg, #ecfdf5 0%, #d1fae5 100%);
+      border: 1px solid rgba(16, 185, 129, 0.4);
+      color: #065f46;
+    }
+
+    .cvr-upload-result.error {
+      background: #fef2f2;
+      border: 1px solid rgba(248, 113, 113, 0.5);
+      color: #b91c1c;
+    }
+
+    .cvr-upload-result .match-count {
+      font-weight: 700;
+      color: #059669;
+    }
+
+    /* Priority File Slots */
+    .cvr-file-slot {
+      margin-top: 16px;
+      padding: 14px;
+      background: rgba(255, 255, 255, 0.7);
+      border-radius: 10px;
+      border: 1px solid rgba(148, 163, 184, 0.3);
+    }
+
+    .cvr-file-slot:first-of-type {
+      margin-top: 16px;
+    }
+
+    .slot-header {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 10px;
+    }
+
+    .slot-number {
+      font-size: 14px;
+      font-weight: 700;
+      color: #059669;
+    }
+
+    .slot-label {
+      font-size: 14px;
+      font-weight: 500;
+      color: #374151;
+    }
+
+    .slot-label small {
+      font-weight: 400;
+      color: #6b7280;
+      font-size: 11px;
+    }
+
+    .cvr-overall-status {
+      margin-top: 16px;
+      padding: 14px 16px;
+      border-radius: 10px;
+      font-size: 13px;
+      background: linear-gradient(135deg, #eff6ff 0%, #f0fdf4 100%);
+      border: 1px solid rgba(59, 130, 246, 0.3);
+      color: #1e40af;
+      line-height: 1.6;
+    }
+
+    .cvr-overall-status .status-filled {
+      font-weight: 700;
+      color: #059669;
+    }
+
+    .cvr-overall-status .status-remaining {
+      color: #d97706;
+      font-weight: 600;
+    }
+
+    .cvr-overall-status .status-excluded {
+      color: #6b7280;
+      font-style: italic;
+    }
+
+    .cvr-manual-section {
+      margin-top: 24px;
+      padding-top: 24px;
+      border-top: 1px solid rgba(148, 163, 184, 0.3);
+    }
+
+    .cvr-manual-section .section-title {
+      font-size: 14px;
+      font-weight: 600;
+      color: #374151;
+      margin-bottom: 8px;
+    }
+
+    .cvr-manual-section .section-hint {
+      font-size: 11px;
+      color: #6b7280;
+      margin-bottom: 12px;
+      line-height: 1.5;
+      letter-spacing: 0.02em;
     }
 
     /* ---------- Table & Filters ---------- */
     .table-controls {
-      font-size: 12px;
+      font-size: 13px;
       color: #4b5563;
-      margin-bottom: 6px;
+      margin-bottom: 8px;
       display: flex;
       align-items: center;
       gap: 16px;
@@ -343,7 +550,7 @@
       user-select: none;
       display: inline-flex;
       align-items: center;
-      gap: 5px;
+      gap: 6px;
     }
 
     .table-controls input[type="checkbox"] {
@@ -354,24 +561,25 @@
       border-collapse: collapse;
       width: 100%;
       margin-top: 8px;
-      font-size: 12px;
+      font-size: 13px;
     }
 
-    th, td {
-      border: 1px solid rgba(226, 232, 240, 0.9);
-      padding: 7px 9px;
+    th,
+    td {
+      border: 1px solid rgba(226, 232, 240, 0.5);
+      padding: 10px 12px;
       text-align: left;
       vertical-align: top;
     }
 
     th {
       background: linear-gradient(to bottom, #f9fafb, #edf2ff);
-      font-weight: 600;
+      font-weight: 700;
       white-space: nowrap;
       font-size: 11px;
       color: #374151;
       text-transform: uppercase;
-      letter-spacing: .06em;
+      letter-spacing: .08em;
     }
 
     thead th {
@@ -385,43 +593,202 @@
       background: #f9fafb;
     }
 
+    tbody tr {
+      animation: fade-in-up 0.25s ease-out backwards;
+      transition: background var(--transition-fast);
+    }
+
+    @keyframes fade-in-up {
+      from {
+        opacity: 0;
+        transform: translateY(4px);
+      }
+
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
     tr.updated-row td {
-      background: var(--success-soft);
+      background: linear-gradient(90deg, #ecfdf5 0%, #f0fdf4 100%) !important;
+      transition: background 0.6s ease-out;
     }
 
     .footer-note {
-      margin-top: 10px;
+      margin-top: 16px;
       font-size: 11px;
       color: var(--text-muted);
+      line-height: 1.6;
+      letter-spacing: 0.02em;
     }
 
     .footer-note strong {
       color: #111827;
+      font-weight: 600;
     }
 
     .badge {
       display: inline-flex;
       align-items: center;
       border-radius: var(--radius-pill);
-      padding: 2px 9px;
+      padding: 3px 10px;
       font-size: 11px;
       background: #eef2ff;
       color: #4338ca;
-      margin-left: 6px;
+      margin-left: 8px;
       border: 1px solid rgba(129, 140, 248, 0.35);
+      font-weight: 600;
+      transition: transform var(--transition-fast);
+    }
+
+    .badge.badge-pop {
+      animation: badge-pop 0.6s ease-out;
+    }
+
+    @keyframes badge-pop {
+
+      0%,
+      100% {
+        transform: scale(1);
+      }
+
+      50% {
+        transform: scale(1.15);
+      }
+    }
+
+    /* ---------- Sorting and Filtering ---------- */
+    /* Sortable headers */
+    th.sortable {
+      cursor: pointer;
+      user-select: none;
+      position: relative;
+      padding-right: 24px;
+      transition: all var(--transition-fast);
+    }
+
+    th.sortable:hover {
+      background: linear-gradient(to bottom, #edf2ff, #dce7ff);
+    }
+
+    th.sortable::after {
+      content: '↕';
+      position: absolute;
+      right: 8px;
+      opacity: 0.3;
+      font-size: 10px;
+      transition: opacity var(--transition-fast);
+    }
+
+    th.sortable:hover::after {
+      opacity: 0.6;
+    }
+
+    th.sortable.sort-asc::after {
+      content: '▲';
+      opacity: 1;
+      color: var(--accent-strong);
+    }
+
+    th.sortable.sort-desc::after {
+      content: '▼';
+      opacity: 1;
+      color: var(--accent-strong);
+    }
+
+    /* Filter row */
+    tr.filter-row th {
+      background: #ffffff;
+      padding: 6px 8px;
+      border-top: 2px solid rgba(129, 140, 248, 0.3);
+    }
+
+    tr.filter-row input,
+    tr.filter-row select {
+      width: 100%;
+      padding: 5px 8px;
+      font-size: 11px;
+      border-radius: 6px;
+      border: 1px solid rgba(148, 163, 184, 0.5);
+      background: white;
+      box-sizing: border-box;
+      transition: all var(--transition-fast);
+    }
+
+    tr.filter-row input:focus,
+    tr.filter-row select:focus {
+      outline: none;
+      border-color: var(--accent-strong);
+      box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.12);
+      transform: scale(1.01);
+    }
+
+    tr.filter-row input.has-filter,
+    tr.filter-row select.has-filter {
+      background: #eef2ff;
+      border-color: var(--accent);
+    }
+
+    /* Filter controls */
+    .filter-controls {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-top: 8px;
+      margin-bottom: 8px;
+      font-size: 13px;
+    }
+
+    .filter-controls button {
+      padding: 6px 14px;
+      font-size: 11px;
+      border-radius: 6px;
+      border: 1px solid rgba(148, 163, 184, 0.5);
+      background: white;
+      color: #374151;
+      cursor: pointer;
+      transition: all var(--transition-fast);
+      font-weight: 500;
+    }
+
+    .filter-controls button:hover {
+      background: #f3f4f6;
+      border-color: var(--accent);
+      transform: translateY(-1px);
+    }
+
+    .filter-controls button:active {
+      transform: translateY(0);
+    }
+
+    .filter-controls .row-count {
+      color: #6b7280;
+      font-weight: 500;
+    }
+
+    .filter-controls .row-count .count {
+      color: var(--accent-strong);
+      font-weight: 700;
     }
 
     /* Responsive */
     @media (max-width: 768px) {
       .card {
-        padding: 16px 14px 18px;
+        padding: 16px;
       }
+
       .title-block h1 {
-        font-size: 22px;
+        font-size: 24px;
+      }
+
+      body {
+        padding: 24px 16px;
       }
     }
   </style>
 </head>
+
 <body>
   <div class="app-shell">
     <!-- Header -->
@@ -463,7 +830,7 @@
       </div>
 
       <div class="card-subtitle">
-        Works with Sponsored Products bulk sheets (XLSX/XLS or CSV/TSV/TXT).  
+        Works with Sponsored Products bulk sheets (XLSX/XLS or CSV/TSV/TXT).
         The tool will auto-select the <strong>“Sponsored Products Campaigns”</strong> sheet.
       </div>
 
@@ -497,7 +864,71 @@
         0% CR rows are handled using the clicks / required-clicks logic.
       </div>
 
-      <div id="cvrContainer"></div>
+      <!-- Conversion File Upload Section - Multi-file Priority System -->
+      <div class="cvr-upload-section">
+        <div class="section-title">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4M17 8l-5-5-5 5M12 3v12" />
+          </svg>
+          Auto-Import from Product Conversion Files
+        </div>
+        <div class="section-hint">
+          Upload product files in priority order. Each file fills only products not yet filled by previous files.
+          <br><em>SKUs with 0% conversion (no data) are automatically skipped.</em>
+        </div>
+
+        <!-- File 1: Last 7 Days (Primary) -->
+        <div class="cvr-file-slot" id="cvrSlot1">
+          <div class="slot-header">
+            <span class="slot-number">①</span>
+            <span class="slot-label">Last 7 Days <small>(Primary - most recent data)</small></span>
+          </div>
+          <div class="file-input-wrapper">
+            <input id="cvrFileInput1" type="file" accept=".csv,.xlsx,.xls" data-priority="1">
+            <div class="hint">Upload 7-day product conversion file</div>
+          </div>
+          <div id="cvrUploadResult1" class="cvr-upload-result" style="display:none;"></div>
+        </div>
+
+        <!-- File 2: Last 30 Days (Secondary) -->
+        <div class="cvr-file-slot" id="cvrSlot2">
+          <div class="slot-header">
+            <span class="slot-number">②</span>
+            <span class="slot-label">Last 30 Days <small>(Secondary - for remaining products)</small></span>
+          </div>
+          <div class="file-input-wrapper">
+            <input id="cvrFileInput2" type="file" accept=".csv,.xlsx,.xls" data-priority="2">
+            <div class="hint">Upload 30-day product conversion file</div>
+          </div>
+          <div id="cvrUploadResult2" class="cvr-upload-result" style="display:none;"></div>
+        </div>
+
+        <!-- File 3: Last 90 Days (Tertiary) -->
+        <div class="cvr-file-slot" id="cvrSlot3">
+          <div class="slot-header">
+            <span class="slot-number">③</span>
+            <span class="slot-label">Last 90 Days <small>(Tertiary - for any remaining)</small></span>
+          </div>
+          <div class="file-input-wrapper">
+            <input id="cvrFileInput3" type="file" accept=".csv,.xlsx,.xls" data-priority="3">
+            <div class="hint">Upload 90-day product conversion file</div>
+          </div>
+          <div id="cvrUploadResult3" class="cvr-upload-result" style="display:none;"></div>
+        </div>
+
+        <!-- Overall Status -->
+        <div id="cvrOverallStatus" class="cvr-overall-status" style="display:none;"></div>
+      </div>
+
+      <!-- Manual Input Section -->
+      <div class="cvr-manual-section">
+        <div class="section-title">Manual Entry / Override</div>
+        <div class="section-hint">
+          You can also manually enter or adjust conversion rates below. Values from uploaded file will be pre-filled if
+          available.
+        </div>
+        <div id="cvrContainer"></div>
+      </div>
 
       <button id="saveCvrBtn" class="btn-primary">
         Apply rules
@@ -529,24 +960,54 @@
       </div>
 
       <div style="font-size:12px; color:#6b7280; margin-bottom:10px;">
-        Product name is taken from the campaign name before the first <code>|</code>.  
-        Rows highlighted in green have updated <strong>Percentage</strong> and will be uploaded with <strong>Operation = "Update"</strong>.
+        Product name is taken from the campaign name before the first <code>|</code>.
+        Rows highlighted in green have updated <strong>Percentage</strong> and will be uploaded with <strong>Operation =
+          "Update"</strong>.
+      </div>
+
+      <!-- Filter Controls -->
+      <div class="filter-controls" id="filterControls" style="display:none;">
+        <button id="clearFiltersBtn">Clear All Filters</button>
+        <span class="row-count" id="filterRowCount"></span>
       </div>
 
       <div style="max-height: 500px; overflow:auto; border-radius: 12px; border: 1px solid rgba(148, 163, 184, 0.35);">
         <table id="resultTable">
           <thead>
             <tr>
-              <th>#</th>
-              <th>Product Name</th>
-              <th>Campaign Name</th>
-              <th>Campaign State</th>
-              <th>Placement</th>
-              <th>Clicks</th>
-              <th>Row Conversion Rate</th>
-              <th>Old %</th>
-              <th>New %</th>
-              <th>Campaign ID</th>
+              <th class="sortable" data-column="rowNumber">#</th>
+              <th class="sortable" data-column="productName">Product Name</th>
+              <th class="sortable" data-column="campaignName">Campaign Name</th>
+              <th class="sortable" data-column="campaignState">Campaign State</th>
+              <th class="sortable" data-column="placement">Placement</th>
+              <th class="sortable" data-column="clicks">Clicks</th>
+              <th class="sortable" data-column="conversionRate">Row Conversion Rate</th>
+              <th class="sortable" data-column="oldPercentage">Old %</th>
+              <th class="sortable" data-column="newPercentage">New %</th>
+              <th class="sortable" data-column="campaignId">Campaign ID</th>
+            </tr>
+            <tr class="filter-row">
+              <th><input type="text" id="filter-rowNumber" placeholder="#" data-column="rowNumber"></th>
+              <th><input type="text" id="filter-productName" placeholder="Filter..." data-column="productName"></th>
+              <th><input type="text" id="filter-campaignName" placeholder="Filter..." data-column="campaignName"></th>
+              <th>
+                <select id="filter-campaignState" data-column="campaignState">
+                  <option value="">All States</option>
+                  <option value="enabled">Enabled</option>
+                  <option value="paused">Paused</option>
+                  <option value="archived">Archived</option>
+                </select>
+              </th>
+              <th><input type="text" id="filter-placement" placeholder="Filter..." data-column="placement"></th>
+              <th><input type="text" id="filter-clicks" placeholder="e.g. >50" data-column="clicks" data-type="numeric">
+              </th>
+              <th><input type="text" id="filter-conversionRate" placeholder="e.g. 10-20" data-column="conversionRate"
+                  data-type="numeric"></th>
+              <th><input type="text" id="filter-oldPercentage" placeholder="e.g. <100" data-column="oldPercentage"
+                  data-type="numeric"></th>
+              <th><input type="text" id="filter-newPercentage" placeholder="e.g. >0" data-column="newPercentage"
+                  data-type="numeric"></th>
+              <th><input type="text" id="filter-campaignId" placeholder="Filter..." data-column="campaignId"></th>
             </tr>
           </thead>
           <tbody></tbody>
@@ -560,7 +1021,7 @@
         Downloaded file keeps <strong>only</strong> the header row and the rows where
         <strong>Operation = "Update"</strong>. This makes the file much smaller for Amazon upload.<br>
         Only <strong>Percentage</strong> and <strong>Operation</strong>
-        are changed on bidding-adjustment rows for enabled campaigns.  
+        are changed on bidding-adjustment rows for enabled campaigns.
         A dedupe pass runs when reading the sheet and again before download, so the exported sheet has
         <strong>no duplicate rows</strong>.
       </div>
@@ -569,630 +1030,1238 @@
 
   <!-- JS: logic updated to keep only Operation="Update" rows on export -->
   <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
-<script>
-  const fileInput = document.getElementById("fileInput");
-  const loadingEl = document.getElementById("loading");
-  const errorEl   = document.getElementById("error");
-  const statsEl   = document.getElementById("stats");
-  const summaryEl = document.getElementById("summary");
-  const sheetUsedEl = document.getElementById("sheetUsed");
-  const tableCard = document.getElementById("tableCard");
-  const rowCountBadge = document.getElementById("rowCountBadge");
-  const resultTableBody = document.querySelector("#resultTable tbody");
+  <script>
+    const fileInput = document.getElementById("fileInput");
+    const loadingEl = document.getElementById("loading");
+    const errorEl = document.getElementById("error");
+    const statsEl = document.getElementById("stats");
+    const summaryEl = document.getElementById("summary");
+    const sheetUsedEl = document.getElementById("sheetUsed");
+    const tableCard = document.getElementById("tableCard");
+    const rowCountBadge = document.getElementById("rowCountBadge");
+    const resultTableBody = document.querySelector("#resultTable tbody");
 
-  const cvrCard = document.getElementById("cvrCard");
-  const cvrContainer = document.getElementById("cvrContainer");
-  const saveCvrBtn = document.getElementById("saveCvrBtn");
-  const cvrStatus = document.getElementById("cvrStatus");
-  const downloadBtn = document.getElementById("downloadBtn");
+    const cvrCard = document.getElementById("cvrCard");
+    const cvrContainer = document.getElementById("cvrContainer");
+    const saveCvrBtn = document.getElementById("saveCvrBtn");
+    const cvrStatus = document.getElementById("cvrStatus");
+    const downloadBtn = document.getElementById("downloadBtn");
 
-  const updatedSummaryEl = document.getElementById("updatedSummary");
-  const showUpdatedOnlyEl = document.getElementById("showUpdatedOnly");
+    const updatedSummaryEl = document.getElementById("updatedSummary");
+    const showUpdatedOnlyEl = document.getElementById("showUpdatedOnly");
 
-  let currentRows = [];
-  let productList = [];
-  let productCvrMap = {};
-  let globalIsExcel = false;
-  let globalWorkbook = null;
-  let globalSheetName = null;
-  let globalDelimiter = null;
-  let globalSheetData = null;
+    // Multi-file conversion upload elements (3 priority slots)
+    const cvrFileInput1 = document.getElementById("cvrFileInput1");
+    const cvrFileInput2 = document.getElementById("cvrFileInput2");
+    const cvrFileInput3 = document.getElementById("cvrFileInput3");
+    const cvrUploadResult1 = document.getElementById("cvrUploadResult1");
+    const cvrUploadResult2 = document.getElementById("cvrUploadResult2");
+    const cvrUploadResult3 = document.getElementById("cvrUploadResult3");
+    const cvrOverallStatus = document.getElementById("cvrOverallStatus");
 
-  let idxEntity = -1;
-  let idxCampaignName = -1;
-  let idxCampaignState = -1;
-  let idxPlacement = -1;
-  let idxPercentage = -1;
-  let idxCampaignId = -1;
-  let idxConvRate = -1;
-  let idxOperation = -1;
-  let idxClicks = -1;
+    // Track which products have been filled (to prevent overwriting by lower priority files)
+    let filledProducts = new Set();
 
-  let debugTotalBidding = 0;
-  let debugTotalBiddingEnabled = 0;
+    // Sorting and filtering elements
+    const filterControls = document.getElementById("filterControls");
+    const clearFiltersBtn = document.getElementById("clearFiltersBtn");
+    const filterRowCount = document.getElementById("filterRowCount");
+    const sortableHeaders = document.querySelectorAll("th.sortable");
+    const filterInputs = document.querySelectorAll(".filter-row input, .filter-row select");
 
-  fileInput.addEventListener("change", () => {
-    const file = fileInput.files[0];
-    if (!file) return;
+    // Sorting and filtering state
+    let currentSortColumn = null;
+    let currentSortDirection = null; // 'asc' or 'desc'
+    let activeFilters = {};
 
-    resetUI();
-    loadingEl.style.display = "flex";
+    let currentRows = [];
+    let productList = [];
+    let productCvrMap = {};
+    let globalIsExcel = false;
+    let globalWorkbook = null;
+    let globalSheetName = null;
+    let globalDelimiter = null;
+    let globalSheetData = null;
 
-    const reader = new FileReader();
-    const name = file.name.toLowerCase();
-    const isExcel = name.endsWith(".xlsx") || name.endsWith(".xls");
-    globalIsExcel = isExcel;
+    let idxEntity = -1;
+    let idxCampaignName = -1;
+    let idxCampaignState = -1;
+    let idxPlacement = -1;
+    let idxPercentage = -1;
+    let idxCampaignId = -1;
+    let idxConvRate = -1;
+    let idxOperation = -1;
+    let idxClicks = -1;
+    let idxSku = -1;  // SKU column index for linking to conversion file
 
-    reader.onload = (e) => {
-      try {
-        if (isExcel) {
-          const data = new Uint8Array(e.target.result);
-          const workbook = XLSX.read(data, { type: "array" });
-          globalWorkbook = workbook;
+    let debugTotalBidding = 0;
+    let debugTotalBiddingEnabled = 0;
 
-          const desiredName = "Sponsored Products Campaigns";
-          let sheetNameToUse = null;
+    // SKU to Product mapping for conversion file linking
+    let skuToProductMap = {};  // Maps SKU -> product name
 
-          if (workbook.SheetNames.includes(desiredName)) {
-            sheetNameToUse = desiredName;
-          } else {
-            const lowerNames = workbook.SheetNames.map(n => n.toLowerCase());
-            const idx = lowerNames.findIndex(n =>
-              n.includes("sponsored products") && n.includes("campaign")
-            );
-            if (idx !== -1) {
-              sheetNameToUse = workbook.SheetNames[idx];
+
+    fileInput.addEventListener("change", () => {
+      const file = fileInput.files[0];
+      if (!file) return;
+
+      resetUI();
+      loadingEl.style.display = "flex";
+
+      const reader = new FileReader();
+      const name = file.name.toLowerCase();
+      const isExcel = name.endsWith(".xlsx") || name.endsWith(".xls");
+      globalIsExcel = isExcel;
+
+      reader.onload = (e) => {
+        try {
+          if (isExcel) {
+            const data = new Uint8Array(e.target.result);
+            const workbook = XLSX.read(data, { type: "array" });
+            globalWorkbook = workbook;
+
+            const desiredName = "Sponsored Products Campaigns";
+            let sheetNameToUse = null;
+
+            if (workbook.SheetNames.includes(desiredName)) {
+              sheetNameToUse = desiredName;
             } else {
-              sheetNameToUse = workbook.SheetNames[0];
+              const lowerNames = workbook.SheetNames.map(n => n.toLowerCase());
+              const idx = lowerNames.findIndex(n =>
+                n.includes("sponsored products") && n.includes("campaign")
+              );
+              if (idx !== -1) {
+                sheetNameToUse = workbook.SheetNames[idx];
+              } else {
+                sheetNameToUse = workbook.SheetNames[0];
+              }
+            }
+
+            globalSheetName = sheetNameToUse;
+            const worksheet = workbook.Sheets[sheetNameToUse];
+
+            sheetUsedEl.style.display = "block";
+            sheetUsedEl.textContent = 'Using sheet: "' + sheetNameToUse + '"';
+
+            const tsv = XLSX.utils.sheet_to_csv(worksheet, { FS: "\t" });
+            handleParsedText(tsv);
+          } else {
+            globalWorkbook = null;
+            globalSheetName = null;
+            const text = e.target.result;
+            handleParsedText(text);
+          }
+        } catch (err) {
+          loadingEl.style.display = "none";
+          showError("Error processing file: " + err.message);
+          console.error(err);
+        }
+      };
+
+      reader.onerror = () => {
+        loadingEl.style.display = "none";
+        showError("Failed to read file.");
+      };
+
+      if (isExcel) {
+        reader.readAsArrayBuffer(file);
+      } else {
+        reader.readAsText(file);
+      }
+    });
+
+    function handleParsedText(text) {
+      const rows = processBulkText(text);
+
+      loadingEl.style.display = "none";
+
+      if (rows.length === 0) {
+        if (debugTotalBidding === 0) {
+          showError('No rows found where Entity starts with "Bidding". This bulksheet may have been exported without bidding adjustments / placements.');
+        } else if (debugTotalBiddingEnabled === 0) {
+          showError('Found ' + debugTotalBidding + ' bidding-adjustment row(s) in total, but 0 where Campaign state is "enabled". All bidding rows are for paused/archived campaigns.');
+        } else {
+          showError('No rows found with Entity = "Bidding adjustment" and Campaign state = "enabled".');
+        }
+        return;
+      }
+
+      currentRows = rows;
+      renderStats(rows);
+      renderSummary(rows);
+      renderTable(rows);
+      renderCvrInputs(rows);
+    }
+
+    function resetUI() {
+      errorEl.style.display = "none";
+      errorEl.textContent = "";
+      statsEl.style.display = "none";
+      statsEl.textContent = "";
+      summaryEl.style.display = "none";
+      summaryEl.textContent = "";
+      sheetUsedEl.style.display = "none";
+      sheetUsedEl.textContent = "";
+      tableCard.style.display = "none";
+      resultTableBody.innerHTML = "";
+      cvrCard.style.display = "none";
+      cvrContainer.innerHTML = "";
+      cvrStatus.style.display = "none";
+      cvrStatus.textContent = "";
+      downloadBtn.style.display = "none";
+      updatedSummaryEl.textContent = "";
+      showUpdatedOnlyEl.checked = false;
+
+      currentRows = [];
+      productList = [];
+      productCvrMap = {};
+
+      globalWorkbook = null;
+      globalSheetName = null;
+      globalSheetData = null;
+      globalDelimiter = null;
+
+      idxEntity = idxCampaignName = idxCampaignState = idxPlacement =
+        idxPercentage = idxCampaignId = idxConvRate = idxOperation = idxClicks = idxSku = -1;
+
+      debugTotalBidding = 0;
+      debugTotalBiddingEnabled = 0;
+
+      // Reset conversion file uploads (all 3 slots)
+      skuToProductMap = {};
+      filledProducts = new Set();
+      cvrUploadResult1.style.display = "none";
+      cvrUploadResult1.innerHTML = "";
+      cvrFileInput1.value = "";
+      cvrUploadResult2.style.display = "none";
+      cvrUploadResult2.innerHTML = "";
+      cvrFileInput2.value = "";
+      cvrUploadResult3.style.display = "none";
+      cvrUploadResult3.innerHTML = "";
+      cvrFileInput3.value = "";
+      cvrOverallStatus.style.display = "none";
+      cvrOverallStatus.innerHTML = "";
+
+      // Reset sorting and filtering
+      currentSortColumn = null;
+      currentSortDirection = null;
+      activeFilters = {};
+      sortableHeaders.forEach(h => {
+        h.classList.remove("sort-asc", "sort-desc");
+      });
+      filterInputs.forEach(input => {
+        if (input.tagName === "SELECT") {
+          input.value = "";
+        } else {
+          input.value = "";
+        }
+        input.classList.remove("has-filter");
+      });
+      filterControls.style.display = "none";
+    }
+
+    function showError(msg) {
+      errorEl.style.display = "block";
+      errorEl.textContent = msg;
+    }
+
+    function headerIndex(headers, name) {
+      const target = name.toLowerCase();
+      return headers.findIndex(h => h.toLowerCase() === target);
+    }
+
+    // Normalize product name to prevent duplicates from whitespace/spacing differences
+    function normalizeProductName(name) {
+      if (!name) return "";
+      // Trim whitespace, replace multiple spaces with single space
+      return name.trim().replace(/\s+/g, " ");
+    }
+
+    function processBulkText(text) {
+      const lines = text.split(/\r?\n/).filter(l => l.trim() !== "");
+      if (lines.length === 0) throw new Error("File is empty.");
+
+      const firstLine = lines[0];
+      const delimiter = firstLine.indexOf("\t") !== -1 ? "\t" : ",";
+      globalDelimiter = delimiter;
+
+      const rawSheetData = lines.map(line => line.split(delimiter));
+
+      const seen = new Set();
+      const deduped = [];
+      for (let i = 0; i < rawSheetData.length; i++) {
+        const row = rawSheetData[i];
+        if (i === 0) {
+          deduped.push(row);
+          continue;
+        }
+        const key = row.map(cell => (cell == null ? "" : String(cell))).join("\u0001");
+        if (seen.has(key)) continue;
+        seen.add(key);
+        deduped.push(row);
+      }
+      globalSheetData = deduped;
+
+      const headers = globalSheetData[0].map(h => h.trim());
+
+      idxEntity = headerIndex(headers, "Entity");
+      idxCampaignName = headerIndex(headers, "Campaign name (Informational only)");
+      idxCampaignState = headerIndex(headers, "Campaign state (Informational only)");
+      idxPlacement = headerIndex(headers, "Placement");
+      idxPercentage = headerIndex(headers, "Percentage");
+      idxCampaignId = headerIndex(headers, "Campaign ID");
+      idxConvRate = headerIndex(headers, "Conversion rate");
+      idxOperation = headerIndex(headers, "Operation");
+      idxClicks = headerIndex(headers, "Clicks");
+      idxSku = headerIndex(headers, "SKU");  // For linking to conversion file
+
+      const required = [
+        { name: "Entity", idx: idxEntity },
+        { name: "Campaign name (Informational only)", idx: idxCampaignName },
+        { name: "Campaign state (Informational only)", idx: idxCampaignState },
+        { name: "Placement", idx: idxPlacement },
+        { name: "Percentage", idx: idxPercentage },
+        { name: "Campaign ID", idx: idxCampaignId },
+        { name: "Conversion rate", idx: idxConvRate },
+        { name: "Operation", idx: idxOperation },
+        { name: "Clicks", idx: idxClicks }
+      ];
+
+      const missing = required.filter(c => c.idx === -1).map(c => c.name);
+      if (missing.length > 0) {
+        throw new Error("Missing required column(s): " + missing.join(", "));
+      }
+
+      const result = [];
+      debugTotalBidding = 0;
+      debugTotalBiddingEnabled = 0;
+
+      // Build SKU to Product mapping from ALL rows (not just bidding adjustment rows)
+      skuToProductMap = {};
+      if (idxSku !== -1 && idxCampaignName !== -1) {
+        for (let i = 1; i < globalSheetData.length; i++) {
+          const cols = globalSheetData[i];
+          if (!cols || cols.length === 0) continue;
+
+          const sku = (cols[idxSku] || "").trim();
+          const campaignName = (cols[idxCampaignName] || "").trim();
+
+          if (sku && campaignName) {
+            // Extract product name using same logic (before |) and normalize
+            let productName = campaignName;
+            if (campaignName.includes("|")) {
+              productName = campaignName.split("|")[0];
+            }
+            productName = normalizeProductName(productName);
+
+            // Map SKU to product name (a SKU might appear in multiple rows, same product)
+            if (productName && !skuToProductMap[sku]) {
+              skuToProductMap[sku] = productName;
             }
           }
-
-          globalSheetName = sheetNameToUse;
-          const worksheet = workbook.Sheets[sheetNameToUse];
-
-          sheetUsedEl.style.display = "block";
-          sheetUsedEl.textContent = 'Using sheet: "' + sheetNameToUse + '"';
-
-          const tsv = XLSX.utils.sheet_to_csv(worksheet, { FS: "\t" });
-          handleParsedText(tsv);
-        } else {
-          globalWorkbook = null;
-          globalSheetName = null;
-          const text = e.target.result;
-          handleParsedText(text);
         }
-      } catch (err) {
-        loadingEl.style.display = "none";
-        showError("Error processing file: " + err.message);
-        console.error(err);
-      }
-    };
-
-    reader.onerror = () => {
-      loadingEl.style.display = "none";
-      showError("Failed to read file.");
-    };
-
-    if (isExcel) {
-      reader.readAsArrayBuffer(file);
-    } else {
-      reader.readAsText(file);
-    }
-  });
-
-  function handleParsedText(text) {
-    const rows = processBulkText(text);
-
-    loadingEl.style.display = "none";
-
-    if (rows.length === 0) {
-      if (debugTotalBidding === 0) {
-        showError('No rows found where Entity starts with "Bidding". This bulksheet may have been exported without bidding adjustments / placements.');
-      } else if (debugTotalBiddingEnabled === 0) {
-        showError('Found ' + debugTotalBidding + ' bidding-adjustment row(s) in total, but 0 where Campaign state is "enabled". All bidding rows are for paused/archived campaigns.');
-      } else {
-        showError('No rows found with Entity = "Bidding adjustment" and Campaign state = "enabled".');
-      }
-      return;
-    }
-
-    currentRows = rows;
-    renderStats(rows);
-    renderSummary(rows);
-    renderTable(rows);
-    renderCvrInputs(rows);
-  }
-
-  function resetUI() {
-    errorEl.style.display = "none";
-    errorEl.textContent = "";
-    statsEl.style.display = "none";
-    statsEl.textContent = "";
-    summaryEl.style.display = "none";
-    summaryEl.textContent = "";
-    sheetUsedEl.style.display = "none";
-    sheetUsedEl.textContent = "";
-    tableCard.style.display = "none";
-    resultTableBody.innerHTML = "";
-    cvrCard.style.display = "none";
-    cvrContainer.innerHTML = "";
-    cvrStatus.style.display = "none";
-    cvrStatus.textContent = "";
-    downloadBtn.style.display = "none";
-    updatedSummaryEl.textContent = "";
-    showUpdatedOnlyEl.checked = false;
-
-    currentRows = [];
-    productList = [];
-    productCvrMap = {};
-
-    globalWorkbook = null;
-    globalSheetName = null;
-    globalSheetData = null;
-    globalDelimiter = null;
-
-    idxEntity = idxCampaignName = idxCampaignState = idxPlacement =
-      idxPercentage = idxCampaignId = idxConvRate = idxOperation = idxClicks = -1;
-
-    debugTotalBidding = 0;
-    debugTotalBiddingEnabled = 0;
-  }
-
-  function showError(msg) {
-    errorEl.style.display = "block";
-    errorEl.textContent = msg;
-  }
-
-  function headerIndex(headers, name) {
-    const target = name.toLowerCase();
-    return headers.findIndex(h => h.toLowerCase() === target);
-  }
-
-  function processBulkText(text) {
-    const lines = text.split(/\r?\n/).filter(l => l.trim() !== "");
-    if (lines.length === 0) throw new Error("File is empty.");
-
-    const firstLine = lines[0];
-    const delimiter = firstLine.indexOf("\t") !== -1 ? "\t" : ",";
-    globalDelimiter = delimiter;
-
-    const rawSheetData = lines.map(line => line.split(delimiter));
-
-    const seen = new Set();
-    const deduped = [];
-    for (let i = 0; i < rawSheetData.length; i++) {
-      const row = rawSheetData[i];
-      if (i === 0) {
-        deduped.push(row);
-        continue;
-      }
-      const key = row.map(cell => (cell == null ? "" : String(cell))).join("\u0001");
-      if (seen.has(key)) continue;
-      seen.add(key);
-      deduped.push(row);
-    }
-    globalSheetData = deduped;
-
-    const headers = globalSheetData[0].map(h => h.trim());
-
-    idxEntity        = headerIndex(headers, "Entity");
-    idxCampaignName  = headerIndex(headers, "Campaign name (Informational only)");
-    idxCampaignState = headerIndex(headers, "Campaign state (Informational only)");
-    idxPlacement     = headerIndex(headers, "Placement");
-    idxPercentage    = headerIndex(headers, "Percentage");
-    idxCampaignId    = headerIndex(headers, "Campaign ID");
-    idxConvRate      = headerIndex(headers, "Conversion rate");
-    idxOperation     = headerIndex(headers, "Operation");
-    idxClicks        = headerIndex(headers, "Clicks");
-
-    const required = [
-      { name: "Entity", idx: idxEntity },
-      { name: "Campaign name (Informational only)", idx: idxCampaignName },
-      { name: "Campaign state (Informational only)", idx: idxCampaignState },
-      { name: "Placement", idx: idxPlacement },
-      { name: "Percentage", idx: idxPercentage },
-      { name: "Campaign ID", idx: idxCampaignId },
-      { name: "Conversion rate", idx: idxConvRate },
-      { name: "Operation", idx: idxOperation },
-      { name: "Clicks", idx: idxClicks }
-    ];
-
-    const missing = required.filter(c => c.idx === -1).map(c => c.name);
-    if (missing.length > 0) {
-      throw new Error("Missing required column(s): " + missing.join(", "));
-    }
-
-    const result = [];
-    debugTotalBidding = 0;
-    debugTotalBiddingEnabled = 0;
-
-    for (let i = 1; i < globalSheetData.length; i++) {
-      const cols = globalSheetData[i];
-      if (!cols || cols.length === 0 || cols.join("").trim() === "") continue;
-
-      const entityRaw = (cols[idxEntity] || "").trim();
-      const entityNorm = entityRaw.toLowerCase();
-      if (!entityNorm.startsWith("bidding")) continue;
-
-      debugTotalBidding++;
-
-      const campaignStateRaw = (cols[idxCampaignState] || "").trim();
-      const campaignStateNorm = campaignStateRaw.toLowerCase();
-
-      if (campaignStateNorm !== "enabled") {
-        continue;
-      }
-      debugTotalBiddingEnabled++;
-
-      const campaignName = (cols[idxCampaignName] || "").trim();
-      const placement    = (cols[idxPlacement] || "").trim();
-      const percentageStr = (cols[idxPercentage] || "").trim();
-      const campaignId   = (cols[idxCampaignId] || "").trim();
-      const convStrRaw   = (cols[idxConvRate] || "").trim();
-      const clicksStrRaw = (cols[idxClicks] || "").trim();
-
-      let productName = campaignName;
-      if (campaignName.includes("|")) {
-        productName = campaignName.split("|")[0].trim();
-      } else {
-        productName = campaignName.trim();
+        console.log("SKU to Product mapping built:", Object.keys(skuToProductMap).length, "SKUs mapped");
       }
 
-      let oldPct = parseFloat(percentageStr);
-      if (Number.isNaN(oldPct)) oldPct = 0;
 
-      let convStr = convStrRaw.replace("%", "").trim();
-      let convVal = parseFloat(convStr);
-      if (Number.isNaN(convVal)) convVal = NaN;
+      for (let i = 1; i < globalSheetData.length; i++) {
+        const cols = globalSheetData[i];
+        if (!cols || cols.length === 0 || cols.join("").trim() === "") continue;
 
-      let clicksVal = parseFloat(clicksStrRaw.replace(/,/g, ""));
-      if (Number.isNaN(clicksVal)) clicksVal = NaN;
+        const entityRaw = (cols[idxEntity] || "").trim();
+        const entityNorm = entityRaw.toLowerCase();
+        if (!entityNorm.startsWith("bidding")) continue;
 
-      result.push({
-        rowIndex: i,
-        productName,
-        campaignName,
-        campaignState: campaignStateRaw,
-        placement,
-        convRate: convVal,
-        convRateStr: convStrRaw,
-        clicks: clicksVal,
-        clicksStr: clicksStrRaw,
-        oldPercentage: oldPct,
-        percentage: String(oldPct),
-        campaignId,
-        updated: false
-      });
+        debugTotalBidding++;
+
+        const campaignStateRaw = (cols[idxCampaignState] || "").trim();
+        const campaignStateNorm = campaignStateRaw.toLowerCase();
+
+        if (campaignStateNorm !== "enabled") {
+          continue;
+        }
+        debugTotalBiddingEnabled++;
+
+        const campaignName = (cols[idxCampaignName] || "").trim();
+        const placement = (cols[idxPlacement] || "").trim();
+        const percentageStr = (cols[idxPercentage] || "").trim();
+        const campaignId = (cols[idxCampaignId] || "").trim();
+        const convStrRaw = (cols[idxConvRate] || "").trim();
+        const clicksStrRaw = (cols[idxClicks] || "").trim();
+
+        let productName = campaignName;
+        if (campaignName.includes("|")) {
+          productName = campaignName.split("|")[0];
+        }
+        productName = normalizeProductName(productName);
+
+        let oldPct = parseFloat(percentageStr);
+        if (Number.isNaN(oldPct)) oldPct = 0;
+
+        let convStr = convStrRaw.replace("%", "").trim();
+        let convVal = parseFloat(convStr);
+        if (Number.isNaN(convVal)) convVal = NaN;
+
+        let clicksVal = parseFloat(clicksStrRaw.replace(/,/g, ""));
+        if (Number.isNaN(clicksVal)) clicksVal = NaN;
+
+        result.push({
+          rowIndex: i,
+          productName,
+          campaignName,
+          campaignState: campaignStateRaw,
+          placement,
+          convRate: convVal,
+          convRateStr: convStrRaw,
+          clicks: clicksVal,
+          clicksStr: clicksStrRaw,
+          oldPercentage: oldPct,
+          percentage: String(oldPct),
+          campaignId,
+          updated: false
+        });
+      }
+
+      console.log("Enabled bidding adjustment rows found (deduped):", result.length);
+      console.log("Debug counts: bidding rows total =", debugTotalBidding,
+        ", enabled =", debugTotalBiddingEnabled);
+      return result;
     }
 
-    console.log("Enabled bidding adjustment rows found (deduped):", result.length);
-    console.log("Debug counts: bidding rows total =", debugTotalBidding,
-                ", enabled =", debugTotalBiddingEnabled);
-    return result;
-  }
-
-  function renderStats(rows) {
-    const uniqueCampaigns = new Set(rows.map(r => r.campaignId || r.campaignName));
-    statsEl.style.display = "block";
-    statsEl.innerHTML = `
+    function renderStats(rows) {
+      const uniqueCampaigns = new Set(rows.map(r => r.campaignId || r.campaignName));
+      statsEl.style.display = "block";
+      statsEl.innerHTML = `
       <strong>${rows.length}</strong> bidding adjustment row(s) for ENABLED campaigns across
       <strong>${uniqueCampaigns.size}</strong> campaign(s).
     `;
-  }
+    }
 
-  function renderSummary(rows) {
-    const counts = {};
-    rows.forEach(r => {
-      if (!r.productName) return;
-      counts[r.productName] = (counts[r.productName] || 0) + 1;
-    });
+    function renderSummary(rows) {
+      const counts = {};
+      rows.forEach(r => {
+        if (!r.productName) return;
+        counts[r.productName] = (counts[r.productName] || 0) + 1;
+      });
 
-    const productNames = Object.keys(counts);
-    if (productNames.length === 0) return;
+      const productNames = Object.keys(counts);
+      if (productNames.length === 0) return;
 
-    summaryEl.style.display = "block";
-    summaryEl.innerHTML = `
+      summaryEl.style.display = "block";
+      summaryEl.innerHTML = `
       <strong>Product summary (rows per product):</strong><br>
       ${productNames.map(p => `<span>${escapeHtml(p)}: ${counts[p]}</span>`).join(" ")}
     `;
-  }
+    }
 
-  function renderTable(rows) {
-    tableCard.style.display = "block";
-    rowCountBadge.textContent = rows.length + " rows";
+    function renderTable(rows) {
+      tableCard.style.display = "block";
+      rowCountBadge.textContent = rows.length + " rows";
 
-    const updatedCount = rows.filter(r => r.updated).length;
-    updatedSummaryEl.textContent = `${updatedCount} row(s) updated out of ${rows.length} bidding adjustment row(s).`;
+      const updatedCount = rows.filter(r => r.updated).length;
+      updatedSummaryEl.textContent = `${updatedCount} row(s) updated out of ${rows.length} bidding adjustment row(s).`;
 
-    resultTableBody.innerHTML = "";
-    rows.forEach((r, index) => {
-      const tr = document.createElement("tr");
-      if (r.updated) tr.classList.add("updated-row");
-      tr.dataset.rowIndex = index;
+      // Use new sorting and filtering system
+      applySortingAndFiltering();
+    }
 
-      const convDisplay = Number.isNaN(r.convRate)
-        ? escapeHtml(r.convRateStr || "")
-        : (r.convRate.toFixed(2) + "%");
+    function renderCvrInputs(rows) {
+      const productsSet = new Set();
+      rows.forEach(r => {
+        if (r.productName) productsSet.add(r.productName);
+      });
 
-      const clicksDisplay = Number.isNaN(r.clicks)
-        ? escapeHtml(r.clicksStr || "")
-        : r.clicks.toString();
+      productList = Array.from(productsSet).sort((a, b) =>
+        a.localeCompare(b, undefined, { sensitivity: "base" })
+      );
 
-      tr.innerHTML = `
-        <td>${index + 1}</td>
-        <td>${escapeHtml(r.productName)}</td>
-        <td>${escapeHtml(r.campaignName)}</td>
-        <td>${escapeHtml(r.campaignState)}</td>
-        <td>${escapeHtml(r.placement)}</td>
+      if (productList.length === 0) {
+        cvrCard.style.display = "none";
+        return;
+      }
+
+      cvrCard.style.display = "block";
+      cvrContainer.innerHTML = "";
+
+      productList.forEach(product => {
+        const rowDiv = document.createElement("div");
+        rowDiv.className = "cvr-row";
+
+        const label = document.createElement("div");
+        label.className = "cvr-label";
+        label.textContent = product;
+
+        const input = document.createElement("input");
+        input.type = "number";
+        input.min = "0";
+        input.max = "100";
+        input.step = "0.01";
+        input.placeholder = "e.g. 10";
+        input.className = "cvr-input";
+        input.dataset.productName = product;
+
+        const suffix = document.createElement("span");
+        suffix.style.fontSize = "13px";
+        suffix.style.color = "#6b7280";
+        suffix.textContent = "%";
+
+        rowDiv.appendChild(label);
+        rowDiv.appendChild(input);
+        rowDiv.appendChild(suffix);
+
+        cvrContainer.appendChild(rowDiv);
+      });
+
+      productCvrMap = {};
+      cvrStatus.style.display = "none";
+      cvrStatus.textContent = "";
+    }
+
+    // Multi-file conversion upload handler - reusable function
+    function processConversionFile(file, priority, resultElement) {
+      if (!file) return;
+
+      // Check if bulk file has been uploaded first
+      if (Object.keys(skuToProductMap).length === 0) {
+        resultElement.style.display = "block";
+        resultElement.className = "cvr-upload-result error";
+        resultElement.innerHTML = "Please upload the bulk file first (Step 1) before uploading conversion files.";
+        return;
+      }
+
+      const reader = new FileReader();
+      const name = file.name.toLowerCase();
+      const isExcel = name.endsWith(".xlsx") || name.endsWith(".xls");
+
+      reader.onload = (e) => {
+        try {
+          let rows = [];
+
+          if (isExcel) {
+            const data = new Uint8Array(e.target.result);
+            const workbook = XLSX.read(data, { type: "array" });
+            const sheetName = workbook.SheetNames[0];
+            const worksheet = workbook.Sheets[sheetName];
+            const csv = XLSX.utils.sheet_to_csv(worksheet, { FS: "," });
+            rows = csv.split(/\r?\n/).filter(l => l.trim() !== "");
+          } else {
+            const text = e.target.result;
+            rows = text.split(/\r?\n/).filter(l => l.trim() !== "");
+          }
+
+          if (rows.length < 2) {
+            throw new Error("File must have a header row and at least one data row.");
+          }
+
+          // Parse headers - handle quoted CSV
+          const parseCSVRow = (row) => {
+            const result = [];
+            let current = "";
+            let inQuotes = false;
+            for (let i = 0; i < row.length; i++) {
+              const char = row[i];
+              if (char === '"') {
+                inQuotes = !inQuotes;
+              } else if (char === "," && !inQuotes) {
+                result.push(current.replace(/^"|"$/g, "").trim());
+                current = "";
+              } else {
+                current += char;
+              }
+            }
+            result.push(current.replace(/^"|"$/g, "").trim());
+            return result;
+          };
+
+          const headers = parseCSVRow(rows[0]).map(h => h.toLowerCase());
+
+          // Find SKU column (could be "Products" or "SKU")
+          let skuColIdx = headers.findIndex(h => h === "products" || h === "sku" || h === "product");
+          // Find Conversion Rate column
+          let cvrColIdx = headers.findIndex(h => h.includes("conversion") && h.includes("rate"));
+
+          if (skuColIdx === -1) {
+            throw new Error('Could not find SKU column. Expected "Products" or "SKU" column header.');
+          }
+          if (cvrColIdx === -1) {
+            throw new Error('Could not find Conversion Rate column. Expected column with "Conversion rate" in header.');
+          }
+
+          // Parse data rows and build SKU -> Conversion Rate map (SKIP 0 conversions)
+          const skuCvrMap = {};
+          let skippedZeroCount = 0;
+          for (let i = 1; i < rows.length; i++) {
+            const cols = parseCSVRow(rows[i]);
+            if (cols.length <= Math.max(skuColIdx, cvrColIdx)) continue;
+
+            const sku = (cols[skuColIdx] || "").trim();
+            let cvrStr = (cols[cvrColIdx] || "").trim();
+
+            if (!sku || !cvrStr) continue;
+
+            // Parse conversion rate (supports decimal like 0.15 or percentage like 15%)
+            let cvrVal = parseFloat(cvrStr.replace("%", ""));
+            if (!Number.isNaN(cvrVal)) {
+              // If value is in decimal format (0.15), convert to percentage (15)
+              if (cvrVal > 0 && cvrVal < 1) {
+                cvrVal = cvrVal * 100;
+              }
+              // SKIP zero conversions - they mean "no data"
+              if (cvrVal > 0) {
+                skuCvrMap[sku] = cvrVal;
+              } else {
+                skippedZeroCount++;
+              }
+            }
+          }
+
+          console.log("Priority", priority, "- Parsed conversion file:", Object.keys(skuCvrMap).length, "SKUs with CVR,", skippedZeroCount, "skipped (zero)");
+
+          // Now link SKUs to products and populate the CVR inputs (ONLY for unfilled products)
+          const productCvrFromFile = {};
+          let matchedSkus = 0;
+
+          for (const sku in skuCvrMap) {
+            // Try exact match first
+            let productName = skuToProductMap[sku];
+
+            // If no exact match, try partial matching (conversion file SKU contains bulk file SKU)
+            if (!productName) {
+              for (const bulkSku in skuToProductMap) {
+                if (sku.toLowerCase().includes(bulkSku.toLowerCase()) && bulkSku.length > 3) {
+                  productName = skuToProductMap[bulkSku];
+                  break;
+                }
+              }
+            }
+
+            if (productName) {
+              // Only add if product not already filled by a higher priority file
+              if (!filledProducts.has(productName) && !productCvrFromFile[productName]) {
+                productCvrFromFile[productName] = skuCvrMap[sku];
+                matchedSkus++;
+              }
+            }
+          }
+
+          // Auto-fill the CVR input fields (only unfilled ones)
+          let newlyFilledCount = 0;
+          const inputs = cvrContainer.querySelectorAll("input.cvr-input");
+          inputs.forEach(input => {
+            const productName = input.dataset.productName;
+            if (productCvrFromFile[productName] !== undefined && !filledProducts.has(productName)) {
+              input.value = productCvrFromFile[productName].toFixed(2);
+              filledProducts.add(productName);
+              newlyFilledCount++;
+            }
+          });
+
+          // Count remaining unfilled
+          const remainingCount = productList.length - filledProducts.size;
+
+          // Show success message for this file
+          resultElement.style.display = "block";
+          resultElement.className = "cvr-upload-result success";
+
+          let resultHtml = `<span class="match-count">${newlyFilledCount}</span> new product(s) filled`;
+          if (skippedZeroCount > 0) {
+            resultHtml += ` <small>(${skippedZeroCount} SKUs with 0% skipped)</small>`;
+          }
+
+          resultElement.innerHTML = resultHtml;
+
+          // Update overall status
+          updateOverallStatus();
+
+        } catch (err) {
+          resultElement.style.display = "block";
+          resultElement.className = "cvr-upload-result error";
+          resultElement.innerHTML = "Error: " + err.message;
+          console.error(err);
+        }
+      };
+
+      reader.onerror = () => {
+        resultElement.style.display = "block";
+        resultElement.className = "cvr-upload-result error";
+        resultElement.innerHTML = "Failed to read the file.";
+      };
+
+      if (isExcel) {
+        reader.readAsArrayBuffer(file);
+      } else {
+        reader.readAsText(file);
+      }
+    }
+
+    // Update overall status showing total filled/remaining
+    function updateOverallStatus() {
+      const totalProducts = productList.length;
+      const filledCount = filledProducts.size;
+      const remainingCount = totalProducts - filledCount;
+
+      cvrOverallStatus.style.display = "block";
+
+      let html = `<strong>Overall Status:</strong> `;
+      html += `<span class="status-filled">${filledCount} of ${totalProducts} product(s) filled</span>`;
+
+      if (remainingCount > 0) {
+        html += ` · <span class="status-remaining">${remainingCount} remaining</span>`;
+        html += `<br><small>Upload additional files (30-day, 90-day) to fill remaining products, or proceed without them.</small>`;
+      } else {
+        html += `<br><small class="status-filled">✓ All products have conversion data! You can now click "Apply rules".</small>`;
+      }
+
+      cvrOverallStatus.innerHTML = html;
+    }
+
+    // Attach event listeners to all 3 file inputs
+    cvrFileInput1.addEventListener("change", () => {
+      processConversionFile(cvrFileInput1.files[0], 1, cvrUploadResult1);
+    });
+
+    cvrFileInput2.addEventListener("change", () => {
+      processConversionFile(cvrFileInput2.files[0], 2, cvrUploadResult2);
+    });
+
+    cvrFileInput3.addEventListener("change", () => {
+      processConversionFile(cvrFileInput3.files[0], 3, cvrUploadResult3);
+    });
+
+    saveCvrBtn.addEventListener("click", () => {
+      if (productList.length === 0) return;
+
+      const inputs = cvrContainer.querySelectorAll("input.cvr-input");
+      const map = {};
+      let skippedProducts = [];
+
+      inputs.forEach(input => {
+        const productName = input.dataset.productName;
+        const valueStr = (input.value || "").trim();
+        if (!valueStr) {
+          // No data - will be excluded from processing (Option A)
+          skippedProducts.push(productName);
+          return;
+        }
+        const num = Number(valueStr);
+        if (Number.isNaN(num) || num <= 0) {
+          // Invalid data - also exclude
+          skippedProducts.push(productName);
+          return;
+        }
+        map[productName] = num;
+      });
+
+      // Allow proceeding with partial data (products without data are excluded)
+      const filledProductCount = Object.keys(map).length;
+
+      if (filledProductCount === 0) {
+        cvrStatus.style.display = "block";
+        cvrStatus.style.color = "#b91c1c";
+        cvrStatus.textContent = "No products have valid conversion rates. Please upload conversion files or enter rates manually.";
+        return;
+      }
+
+      productCvrMap = map;
+      console.log("Saved product CVRs:", productCvrMap);
+      console.log("Excluded products (no data):", skippedProducts);
+
+      applyAdjustmentRules();
+      renderTable(currentRows);
+
+      // Trigger badge pop animation
+      const badge = rowCountBadge;
+      if (badge) {
+        badge.classList.remove("badge-pop");
+        void badge.offsetWidth; // Force reflow
+        badge.classList.add("badge-pop");
+      }
+
+      cvrStatus.style.display = "block";
+      cvrStatus.style.color = "#059669";
+
+      if (skippedProducts.length > 0) {
+        cvrStatus.innerHTML = `Conversion rates applied to <strong>${filledProductCount}</strong> product(s). ` +
+          `<span style="color:#6b7280;">${skippedProducts.length} product(s) excluded (no data in any file).</span>`;
+      } else {
+        cvrStatus.textContent = "Conversion rates applied to all products. Percentages updated where rules were triggered.";
+      }
+
+      downloadBtn.style.display = "inline-flex";
+      // Trigger download button pulse animation
+      downloadBtn.classList.remove("btn-pulse");
+      void downloadBtn.offsetWidth; // Force reflow
+      downloadBtn.classList.add("btn-pulse");
+    });
+
+    showUpdatedOnlyEl.addEventListener("change", applySortingAndFiltering);
+
+    function updateRowVisibility() {
+      const onlyUpdated = showUpdatedOnlyEl.checked;
+      const trs = resultTableBody.querySelectorAll("tr");
+
+      trs.forEach(tr => {
+        const idx = parseInt(tr.dataset.rowIndex, 10);
+        const data = currentRows[idx];
+        tr.style.display = (!onlyUpdated || (data && data.updated)) ? "" : "none";
+      });
+    }
+
+    // ========== SORTING AND FILTERING ==========
+
+    // Parse numeric filter (supports >, <, range, exact)
+    function parseNumericFilter(filterValue, actualValue) {
+      filterValue = filterValue.trim();
+      if (!filterValue) return true;
+
+      const num = parseFloat(actualValue);
+      if (Number.isNaN(num)) return false;
+
+      // Handle >X
+      if (filterValue.startsWith(">")) {
+        const threshold = parseFloat(filterValue.substring(1));
+        return !Number.isNaN(threshold) && num > threshold;
+      }
+
+      // Handle <X
+      if (filterValue.startsWith("<")) {
+        const threshold = parseFloat(filterValue.substring(1));
+        return !Number.isNaN(threshold) && num < threshold;
+      }
+
+      // Handle range X-Y
+      if (filterValue.includes("-")) {
+        const parts = filterValue.split("-").map(p => parseFloat(p.trim()));
+        if (parts.length === 2 && !Number.isNaN(parts[0]) && !Number.isNaN(parts[1])) {
+          return num >= parts[0] && num <= parts[1];
+        }
+      }
+
+      // Handle exact match
+      const exactMatch = parseFloat(filterValue);
+      if (!Number.isNaN(exactMatch)) {
+        return num === exactMatch;
+      }
+
+      return false;
+    }
+
+    // Apply sorting and filtering
+    function applySortingAndFiltering() {
+      let filteredRows = filterRows([...currentRows]);
+      let sortedRows = sortRows(filteredRows);
+
+      // Re-render table
+      resultTableBody.innerHTML = "";
+      let visibleCount = 0;
+
+      sortedRows.forEach((row, displayIndex) => {
+        const tr = document.createElement("tr");
+        tr.dataset.rowIndex = currentRows.indexOf(row);
+
+        if (row.updated) {
+          tr.classList.add("updated-row");
+        }
+
+        // Check "Show only updated" filter
+        const onlyUpdated = showUpdatedOnlyEl.checked;
+        if (onlyUpdated && !row.updated) {
+          tr.style.display = "none";
+        } else {
+          visibleCount++;
+        }
+
+        const escapeHtml = (str) => {
+          const div = document.createElement("div");
+          div.textContent = str;
+          return div.innerHTML;
+        };
+
+        const convDisplay = Number.isNaN(row.convRate)
+          ? escapeHtml(row.convRateStr || "")
+          : (row.convRate.toFixed(2) + "%");
+
+        const clicksDisplay = Number.isNaN(row.clicks)
+          ? escapeHtml(row.clicksStr || "")
+          : row.clicks.toString();
+
+        tr.innerHTML = `
+        <td>${displayIndex + 1}</td>
+        <td>${escapeHtml(row.productName)}</td>
+        <td>${escapeHtml(row.campaignName)}</td>
+        <td>${escapeHtml(row.campaignState)}</td>
+        <td>${escapeHtml(row.placement)}</td>
         <td>${clicksDisplay}</td>
         <td>${convDisplay}</td>
-        <td>${r.oldPercentage}</td>
-        <td>${escapeHtml(r.percentage)}</td>
-        <td>${escapeHtml(r.campaignId)}</td>
+        <td>${row.oldPercentage}</td>
+        <td>${escapeHtml(row.percentage)}</td>
+        <td>${escapeHtml(row.campaignId)}</td>
       `;
-      resultTableBody.appendChild(tr);
-    });
+        resultTableBody.appendChild(tr);
+      });
 
-    updateRowVisibility();
-  }
-
-  function renderCvrInputs(rows) {
-    const productsSet = new Set();
-    rows.forEach(r => {
-      if (r.productName) productsSet.add(r.productName);
-    });
-
-    productList = Array.from(productsSet).sort((a, b) =>
-      a.localeCompare(b, undefined, { sensitivity: "base" })
-    );
-
-    if (productList.length === 0) {
-      cvrCard.style.display = "none";
-      return;
+      // Update row count
+      updateFilterRowCount(sortedRows.length, currentRows.length, visibleCount);
     }
 
-    cvrCard.style.display = "block";
-    cvrContainer.innerHTML = "";
-
-    productList.forEach(product => {
-      const rowDiv = document.createElement("div");
-      rowDiv.className = "cvr-row";
-
-      const label = document.createElement("div");
-      label.className = "cvr-label";
-      label.textContent = product;
-
-      const input = document.createElement("input");
-      input.type = "number";
-      input.min = "0";
-      input.max = "100";
-      input.step = "0.01";
-      input.placeholder = "e.g. 10";
-      input.className = "cvr-input";
-      input.dataset.productName = product;
-
-      const suffix = document.createElement("span");
-      suffix.style.fontSize = "13px";
-      suffix.style.color = "#6b7280";
-      suffix.textContent = "%";
-
-      rowDiv.appendChild(label);
-      rowDiv.appendChild(input);
-      rowDiv.appendChild(suffix);
-
-      cvrContainer.appendChild(rowDiv);
-    });
-
-    productCvrMap = {};
-    cvrStatus.style.display = "none";
-    cvrStatus.textContent = "";
-  }
-
-  saveCvrBtn.addEventListener("click", () => {
-    if (productList.length === 0) return;
-
-    const inputs = cvrContainer.querySelectorAll("input.cvr-input");
-    const map = {};
-    let missing = [];
-
-    inputs.forEach(input => {
-      const productName = input.dataset.productName;
-      const valueStr = (input.value || "").trim();
-      if (!valueStr) {
-        missing.push(productName);
-        return;
+    // Sort rows based on current sort column and direction
+    function sortRows(rows) {
+      if (!currentSortColumn || !currentSortDirection) {
+        return rows;
       }
-      const num = Number(valueStr);
-      if (Number.isNaN(num) || num <= 0) {
-        missing.push(productName + " (invalid or <= 0)");
-        return;
-      }
-      map[productName] = num;
-    });
 
-    if (missing.length > 0) {
-      cvrStatus.style.display = "block";
-      cvrStatus.style.color = "#b91c1c";
-      cvrStatus.textContent = "Please enter a valid conversion rate (> 0) for: " + missing.join(", ");
-      return;
+      return rows.sort((a, b) => {
+        let valA, valB;
+
+        switch (currentSortColumn) {
+          case "rowNumber":
+            valA = currentRows.indexOf(a) + 1;
+            valB = currentRows.indexOf(b) + 1;
+            break;
+          case "productName":
+            valA = a.productName || "";
+            valB = b.productName || "";
+            break;
+          case "campaignName":
+            valA = a.campaignName || "";
+            valB = b.campaignName || "";
+            break;
+          case "campaignState":
+            valA = a.campaignState || "";
+            valB = b.campaignState || "";
+            break;
+          case "placement":
+            valA = a.placement || "";
+            valB = b.placement || "";
+            break;
+          case "clicks":
+            valA = a.clicks || 0;
+            valB = b.clicks || 0;
+            break;
+          case "conversionRate":
+            valA = parseFloat(a.convRate) || 0;
+            valB = parseFloat(b.convRate) || 0;
+            break;
+          case "oldPercentage":
+            valA = parseFloat(a.oldPercentage) || 0;
+            valB = parseFloat(b.oldPercentage) || 0;
+            break;
+          case "newPercentage":
+            valA = parseFloat(a.percentage) || 0;
+            valB = parseFloat(b.percentage) || 0;
+            break;
+          case "campaignId":
+            valA = a.campaignId || "";
+            valB = b.campaignId || "";
+            break;
+          default:
+            return 0;
+        }
+
+        // Compare values
+        let result = 0;
+        if (typeof valA === "string" && typeof valB === "string") {
+          result = valA.localeCompare(valB);
+        } else {
+          result = valA - valB;
+        }
+
+        return currentSortDirection === "asc" ? result : -result;
+      });
     }
 
-    productCvrMap = map;
-    console.log("Saved product CVRs:", productCvrMap);
+    // Filter rows based on active filters
+    function filterRows(rows) {
+      return rows.filter(row => {
+        for (const column in activeFilters) {
+          const filterValue = activeFilters[column];
+          if (!filterValue) continue;
 
-    applyAdjustmentRules();
-    renderTable(currentRows);
+          let actualValue;
+          switch (column) {
+            case "rowNumber":
+              actualValue = (currentRows.indexOf(row) + 1).toString();
+              break;
+            case "productName":
+              actualValue = row.productName || "";
+              break;
+            case "campaignName":
+              actualValue = row.campaignName || "";
+              break;
+            case "campaignState":
+              actualValue = row.campaignState || "";
+              break;
+            case "placement":
+              actualValue = row.placement || "";
+              break;
+            case "clicks":
+              if (!parseNumericFilter(filterValue, row.clicks || 0)) return false;
+              continue;
+            case "conversionRate":
+              if (!parseNumericFilter(filterValue, row.convRate || 0)) return false;
+              continue;
+            case "oldPercentage":
+              if (!parseNumericFilter(filterValue, row.oldPercentage || 0)) return false;
+              continue;
+            case "newPercentage":
+              if (!parseNumericFilter(filterValue, row.percentage || 0)) return false;
+              continue;
+            case "campaignId":
+              actualValue = row.campaignId || "";
+              break;
+            default:
+              continue;
+          }
 
-    cvrStatus.style.display = "block";
-    cvrStatus.style.color = "#059669";
-    cvrStatus.textContent = "Conversion rates applied. Percentages updated where rules were triggered.";
+          // Text filtering (case-insensitive partial match)
+          if (!actualValue.toString().toLowerCase().includes(filterValue.toLowerCase())) {
+            return false;
+          }
+        }
+        return true;
+      });
+    }
 
-    downloadBtn.style.display = "inline-flex";
-  });
+    // Update filter row count display
+    function updateFilterRowCount(filteredCount, totalCount, visibleCount) {
+      const hasFilters = Object.keys(activeFilters).some(key => activeFilters[key]);
+      const onlyUpdated = showUpdatedOnlyEl.checked;
 
-  showUpdatedOnlyEl.addEventListener("change", updateRowVisibility);
+      if (hasFilters) {
+        filterControls.style.display = "flex";
+        if (onlyUpdated) {
+          filterRowCount.innerHTML = `Showing <span class="count">${visibleCount}</span> of <span class="count">${filteredCount}</span> filtered rows (${totalCount - filteredCount} filtered out, ${filteredCount - visibleCount} non-updated)`;
+        } else {
+          filterRowCount.innerHTML = `Showing <span class="count">${filteredCount}</span> of <span class="count">${totalCount}</span> rows (${totalCount - filteredCount} filtered out)`;
+        }
+      } else {
+        filterControls.style.display = "none";
+      }
+    }
 
-  function updateRowVisibility() {
-    const onlyUpdated = showUpdatedOnlyEl.checked;
-    const trs = resultTableBody.querySelectorAll("tr");
+    // Update filter UI (add "has-filter" class to active inputs)
+    function updateFilterUI() {
+      filterInputs.forEach(input => {
+        const column = input.dataset.column;
+        if (activeFilters[column]) {
+          input.classList.add("has-filter");
+        } else {
+          input.classList.remove("has-filter");
+        }
+      });
+    }
 
-    trs.forEach(tr => {
-      const idx = parseInt(tr.dataset.rowIndex, 10);
-      const data = currentRows[idx];
-      tr.style.display = (!onlyUpdated || (data && data.updated)) ? "" : "none";
+    // ========== EVENT LISTENERS FOR SORTING AND FILTERING ==========
+
+    // Sortable header clicks
+    sortableHeaders.forEach(header => {
+      header.addEventListener("click", () => {
+        const column = header.dataset.column;
+
+        // Toggle sort direction
+        if (currentSortColumn === column) {
+          currentSortDirection = currentSortDirection === "asc" ? "desc" : "asc";
+        } else {
+          currentSortColumn = column;
+          currentSortDirection = "asc";
+        }
+
+        // Update UI
+        sortableHeaders.forEach(h => {
+          h.classList.remove("sort-asc", "sort-desc");
+        });
+        header.classList.add(`sort-${currentSortDirection}`);
+
+        // Apply sorting
+        applySortingAndFiltering();
+      });
     });
-  }
 
-  function applyAdjustmentRules() {
-    if (!currentRows || currentRows.length === 0) return;
-    if (!productCvrMap || Object.keys(productCvrMap).length === 0) return;
-    if (!globalSheetData) return;
+    // Filter input changes
+    filterInputs.forEach(input => {
+      input.addEventListener("input", () => {
+        const column = input.dataset.column;
+        const value = input.value.trim();
 
-    currentRows.forEach(row => {
-      const target = productCvrMap[row.productName];
-      if (target === undefined || target <= 0) return;
+        if (value) {
+          activeFilters[column] = value;
+        } else {
+          delete activeFilters[column];
+        }
 
-      const rowCR = row.convRate;
-      const clicks = row.clicks;
+        updateFilterUI();
+        applySortingAndFiltering();
+      });
+    });
 
-      let oldPct = row.oldPercentage;
-      let newPct = oldPct;
+    // Clear filters button
+    clearFiltersBtn.addEventListener("click", () => {
+      activeFilters = {};
+      filterInputs.forEach(input => {
+        if (input.tagName === "SELECT") {
+          input.value = "";
+        } else {
+          input.value = "";
+        }
+        input.classList.remove("has-filter");
+      });
+      filterControls.style.display = "none";
+      applySortingAndFiltering();
+    });
 
-      if (typeof rowCR === "number" && !Number.isNaN(rowCR)) {
-        if (rowCR === 0) {
-          const requiredClicks = 100 / target;
-          if (Number.isFinite(requiredClicks) &&
+    // ========== END SORTING AND FILTERING ==========
+
+    function applyAdjustmentRules() {
+      if (!currentRows || currentRows.length === 0) return;
+      if (!productCvrMap || Object.keys(productCvrMap).length === 0) return;
+      if (!globalSheetData) return;
+
+      currentRows.forEach(row => {
+        const target = productCvrMap[row.productName];
+        if (target === undefined || target <= 0) return;
+
+        const rowCR = row.convRate;
+        const clicks = row.clicks;
+
+        let oldPct = row.oldPercentage;
+        let newPct = oldPct;
+
+        if (typeof rowCR === "number" && !Number.isNaN(rowCR)) {
+          if (rowCR === 0) {
+            const requiredClicks = 100 / target;
+            if (Number.isFinite(requiredClicks) &&
               typeof clicks === "number" &&
               !Number.isNaN(clicks) &&
               clicks > requiredClicks) {
+              newPct = oldPct - 10;
+              if (newPct < 0) newPct = 0;
+            } else {
+              newPct = oldPct;
+            }
+          } else if (rowCR < target) {
             newPct = oldPct - 10;
             if (newPct < 0) newPct = 0;
+          } else if (rowCR > target) {
+            if (oldPct < 100) {
+              newPct = oldPct + 5;
+              if (newPct > 100) newPct = 100;
+            } else {
+              newPct = oldPct;
+            }
           } else {
             newPct = oldPct;
           }
-        } else if (rowCR < target) {
-          newPct = oldPct - 10;
-          if (newPct < 0) newPct = 0;
-        } else if (rowCR > target) {
-          if (oldPct < 100) {
-            newPct = oldPct + 5;
-            if (newPct > 100) newPct = 100;
-          } else {
-            newPct = oldPct;
+        }
+
+        if (newPct !== oldPct) {
+          row.percentage = String(newPct);
+          row.updated = true;
+
+          if (row.rowIndex != null && row.rowIndex < globalSheetData.length) {
+            globalSheetData[row.rowIndex][idxPercentage] = String(newPct);
+            if (idxOperation !== -1) {
+              globalSheetData[row.rowIndex][idxOperation] = "Update";
+            }
           }
         } else {
-          newPct = oldPct;
+          row.updated = false;
+        }
+      });
+    }
+
+    function dedupeSheetData() {
+      if (!globalSheetData) return;
+      const seen = new Set();
+      const deduped = [];
+
+      for (let i = 0; i < globalSheetData.length; i++) {
+        const row = globalSheetData[i];
+        const key = row.map(cell => (cell == null ? "" : String(cell))).join("\u0001");
+        if (seen.has(key)) continue;
+        seen.add(key);
+        deduped.push(row);
+      }
+
+      globalSheetData = deduped;
+    }
+
+    // NEW: Keep only header row + rows where Operation = "Update"
+    function keepOnlyUpdateOperationRows() {
+      if (!globalSheetData || idxOperation === -1) return;
+      if (globalSheetData.length === 0) return;
+
+      const filtered = [];
+      // Always keep header row
+      filtered.push(globalSheetData[0]);
+
+      for (let i = 1; i < globalSheetData.length; i++) {
+        const row = globalSheetData[i];
+        const opVal = (row[idxOperation] || "").trim().toLowerCase();
+        if (opVal === "update") {
+          filtered.push(row);
         }
       }
 
-      if (newPct !== oldPct) {
-        row.percentage = String(newPct);
-        row.updated = true;
+      globalSheetData = filtered;
+    }
 
-        if (row.rowIndex != null && row.rowIndex < globalSheetData.length) {
-          globalSheetData[row.rowIndex][idxPercentage] = String(newPct);
-          if (idxOperation !== -1) {
-            globalSheetData[row.rowIndex][idxOperation] = "Update";
-          }
-        }
+    downloadBtn.addEventListener("click", () => {
+      if (!globalSheetData) {
+        alert("No updated sheet data to download.");
+        return;
+      }
+
+      // First, keep only rows with Operation = "Update" to make file small
+      keepOnlyUpdateOperationRows();
+
+      // Then dedupe the remaining rows
+      dedupeSheetData();
+
+      if (globalIsExcel && globalWorkbook && globalSheetName) {
+        const ws = XLSX.utils.aoa_to_sheet(globalSheetData);
+        globalWorkbook.Sheets[globalSheetName] = ws;
+
+        const wbout = XLSX.write(globalWorkbook, { bookType: "xlsx", type: "array" });
+        const blob = new Blob([wbout], {
+          type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+        });
+
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement("a");
+        a.href = url;
+        a.download = "bulk-updated.xlsx";
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
       } else {
-        row.updated = false;
+        const lines = globalSheetData.map(row =>
+          row.map(cell => (cell == null ? "" : String(cell))).join(globalDelimiter || "\t")
+        );
+        const text = lines.join("\r\n");
+        const ext = (globalDelimiter === "," ? "csv" : "tsv");
+        const blob = new Blob([text], { type: "text/plain;charset=utf-8;" });
+
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement("a");
+        a.href = url;
+        a.download = "bulk-updated." + ext;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
       }
     });
-  }
 
-  function dedupeSheetData() {
-    if (!globalSheetData) return;
-    const seen = new Set();
-    const deduped = [];
-
-    for (let i = 0; i < globalSheetData.length; i++) {
-      const row = globalSheetData[i];
-      const key = row.map(cell => (cell == null ? "" : String(cell))).join("\u0001");
-      if (seen.has(key)) continue;
-      seen.add(key);
-      deduped.push(row);
+    function escapeHtml(str) {
+      if (typeof str !== "string") return "";
+      return str
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#039;");
     }
-
-    globalSheetData = deduped;
-  }
-
-  // NEW: Keep only header row + rows where Operation = "Update"
-  function keepOnlyUpdateOperationRows() {
-    if (!globalSheetData || idxOperation === -1) return;
-    if (globalSheetData.length === 0) return;
-
-    const filtered = [];
-    // Always keep header row
-    filtered.push(globalSheetData[0]);
-
-    for (let i = 1; i < globalSheetData.length; i++) {
-      const row = globalSheetData[i];
-      const opVal = (row[idxOperation] || "").trim().toLowerCase();
-      if (opVal === "update") {
-        filtered.push(row);
-      }
-    }
-
-    globalSheetData = filtered;
-  }
-
-  downloadBtn.addEventListener("click", () => {
-    if (!globalSheetData) {
-      alert("No updated sheet data to download.");
-      return;
-    }
-
-    // First, keep only rows with Operation = "Update" to make file small
-    keepOnlyUpdateOperationRows();
-
-    // Then dedupe the remaining rows
-    dedupeSheetData();
-
-    if (globalIsExcel && globalWorkbook && globalSheetName) {
-      const ws = XLSX.utils.aoa_to_sheet(globalSheetData);
-      globalWorkbook.Sheets[globalSheetName] = ws;
-
-      const wbout = XLSX.write(globalWorkbook, { bookType: "xlsx", type: "array" });
-      const blob = new Blob([wbout], {
-        type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
-      });
-
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement("a");
-      a.href = url;
-      a.download = "bulk-updated.xlsx";
-      document.body.appendChild(a);
-      a.click();
-      document.body.removeChild(a);
-      URL.revokeObjectURL(url);
-    } else {
-      const lines = globalSheetData.map(row =>
-        row.map(cell => (cell == null ? "" : String(cell))).join(globalDelimiter || "\t")
-      );
-      const text = lines.join("\r\n");
-      const ext = (globalDelimiter === "," ? "csv" : "tsv");
-      const blob = new Blob([text], { type: "text/plain;charset=utf-8;" });
-
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement("a");
-      a.href = url;
-      a.download = "bulk-updated." + ext;
-      document.body.appendChild(a);
-      a.click();
-      document.body.removeChild(a);
-      URL.revokeObjectURL(url);
-    }
-  });
-
-  function escapeHtml(str) {
-    if (typeof str !== "string") return "";
-    return str
-      .replace(/&/g, "&amp;")
-      .replace(/</g, "&lt;")
-      .replace(/"/g, "&quot;")
-      .replace(/'/g, "&#039;");
-  }
-</script>
+  </script>
 </body>
+
 </html>
