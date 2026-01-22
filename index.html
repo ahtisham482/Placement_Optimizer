@@ -332,6 +332,36 @@
       transform: scale(1.01);
     }
 
+    .cvr-source-info {
+      font-size: 11px;
+      color: #6b7280;
+      margin-left: 8px;
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      background: rgba(99, 102, 241, 0.08);
+      padding: 4px 8px;
+      border-radius: 6px;
+      white-space: nowrap;
+    }
+
+    .cvr-source-info .source-icon {
+      font-size: 10px;
+    }
+
+    .cvr-source-info .source-sku {
+      font-weight: 600;
+      color: #4338ca;
+      max-width: 180px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .cvr-source-info .source-file {
+      color: #059669;
+      font-weight: 500;
+    }
+
     /* ---------- Buttons ---------- */
     .btn-primary {
       margin-top: 16px;
@@ -1062,6 +1092,9 @@
     // Track which products have been filled (to prevent overwriting by lower priority files)
     let filledProducts = new Set();
 
+    // Track source information for each filled product (SKU and file)
+    let productSourceMap = {};
+
     // Sorting and filtering elements
     const filterControls = document.getElementById("filterControls");
     const clearFiltersBtn = document.getElementById("clearFiltersBtn");
@@ -1505,9 +1538,16 @@
         suffix.style.color = "#6b7280";
         suffix.textContent = "%";
 
+        // Source info element (initially hidden, populated when file is uploaded)
+        const sourceInfo = document.createElement("span");
+        sourceInfo.className = "cvr-source-info";
+        sourceInfo.style.display = "none";
+        sourceInfo.dataset.productName = product;
+
         rowDiv.appendChild(label);
         rowDiv.appendChild(input);
         rowDiv.appendChild(suffix);
+        rowDiv.appendChild(sourceInfo);
 
         cvrContainer.appendChild(rowDiv);
       });
@@ -1602,8 +1642,8 @@
             // Parse conversion rate (supports decimal like 0.15 or percentage like 15%)
             let cvrVal = parseFloat(cvrStr.replace("%", ""));
             if (!Number.isNaN(cvrVal)) {
-              // If value is in decimal format (0.15), convert to percentage (15)
-              if (cvrVal > 0 && cvrVal < 1) {
+              // If value is in decimal format (0.15 or 1.0), convert to percentage (15 or 100)
+              if (cvrVal > 0 && cvrVal <= 1) {
                 cvrVal = cvrVal * 100;
               }
               // SKIP zero conversions - they mean "no data"
@@ -1638,11 +1678,14 @@
             if (productName) {
               // Only add if product not already filled by a higher priority file
               if (!filledProducts.has(productName) && !productCvrFromFile[productName]) {
-                productCvrFromFile[productName] = skuCvrMap[sku];
+                productCvrFromFile[productName] = { cvr: skuCvrMap[sku], sku: sku };
                 matchedSkus++;
               }
             }
           }
+
+          // File priority labels
+          const priorityLabels = { 1: "7-day", 2: "30-day", 3: "90-day" };
 
           // Auto-fill the CVR input fields (only unfilled ones)
           let newlyFilledCount = 0;
@@ -1650,9 +1693,20 @@
           inputs.forEach(input => {
             const productName = input.dataset.productName;
             if (productCvrFromFile[productName] !== undefined && !filledProducts.has(productName)) {
-              input.value = productCvrFromFile[productName].toFixed(2);
+              const sourceData = productCvrFromFile[productName];
+              input.value = sourceData.cvr.toFixed(2);
               filledProducts.add(productName);
               newlyFilledCount++;
+
+              // Store source info
+              productSourceMap[productName] = { sku: sourceData.sku, file: priorityLabels[priority] };
+
+              // Display source info next to the input
+              const sourceInfoEl = cvrContainer.querySelector(`.cvr-source-info[data-product-name="${CSS.escape(productName)}"]`);
+              if (sourceInfoEl) {
+                sourceInfoEl.style.display = "inline-flex";
+                sourceInfoEl.innerHTML = `<span class="source-icon">📋</span> SKU: <span class="source-sku" title="${sourceData.sku}">${sourceData.sku}</span> <span class="source-file">(${priorityLabels[priority]})</span>`;
+              }
             }
           });
 
