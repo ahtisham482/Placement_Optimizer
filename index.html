@@ -802,6 +802,42 @@
       font-weight: 700;
     }
 
+    /* ---------- Virtual Scrolling ---------- */
+    .table-scroll-container {
+      max-height: 600px;
+      overflow-y: auto;
+      overflow-x: auto;
+      border: 1px solid rgba(148, 163, 184, 0.3);
+      border-radius: 8px;
+      margin-top: 8px;
+    }
+
+    .table-scroll-container table {
+      margin-top: 0;
+    }
+
+    .virtual-scroll-info {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 8px 12px;
+      background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%);
+      border-radius: 8px;
+      margin-bottom: 8px;
+      font-size: 12px;
+      color: #0369a1;
+      border: 1px solid rgba(14, 165, 233, 0.2);
+    }
+
+    .virtual-scroll-info .scroll-stats {
+      font-weight: 600;
+    }
+
+    .virtual-scroll-info .scroll-hint {
+      color: #64748b;
+      font-size: 11px;
+    }
+
     /* Responsive */
     @media (max-width: 768px) {
       .card {
@@ -814,6 +850,10 @@
 
       body {
         padding: 24px 16px;
+      }
+
+      .table-scroll-container {
+        max-height: 400px;
       }
     }
   </style>
@@ -1001,7 +1041,13 @@
         <span class="row-count" id="filterRowCount"></span>
       </div>
 
-      <div style="max-height: 500px; overflow:auto; border-radius: 12px; border: 1px solid rgba(148, 163, 184, 0.35);">
+      <!-- Virtual Scroll Info -->
+      <div class="virtual-scroll-info" id="virtualScrollInfo" style="display:none;">
+        <span class="scroll-stats" id="scrollStats">Showing rows 1-50 of 10,000</span>
+        <span class="scroll-hint">Scroll to see more • All rows are sortable and filterable</span>
+      </div>
+
+      <div class="table-scroll-container" id="tableScrollContainer">
         <table id="resultTable">
           <thead>
             <tr>
@@ -1106,6 +1152,27 @@
     let currentSortColumn = null;
     let currentSortDirection = null; // 'asc' or 'desc'
     let activeFilters = {};
+
+    // Virtual scrolling constants and state
+    const VIRTUAL_ROW_HEIGHT = 42; // Approximate height of each row in pixels
+    const VIRTUAL_BUFFER = 10; // Extra rows to render above/below viewport
+    const tableScrollContainer = document.getElementById("tableScrollContainer");
+    const virtualScrollInfo = document.getElementById("virtualScrollInfo");
+    const scrollStats = document.getElementById("scrollStats");
+    let processedRows = []; // Filtered and sorted rows ready for display
+    let lastScrollTop = 0;
+    let renderScheduled = false;
+
+    // Fast string-based HTML escaping (much faster than DOM-based)
+    function escapeHtmlFast(str) {
+      if (typeof str !== "string") return "";
+      return str
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#039;");
+    }
 
     let currentRows = [];
     let productList = [];
@@ -1440,6 +1507,7 @@
 
         result.push({
           rowIndex: i,
+          originalIndex: result.length + 1, // Pre-store display index for O(1) lookups
           productName,
           campaignName,
           campaignState: campaignStateRaw,
@@ -1900,63 +1968,125 @@
       return false;
     }
 
-    // Apply sorting and filtering
+    // Apply sorting and filtering - OPTIMIZED with virtual scrolling
     function applySortingAndFiltering() {
+      const startTime = performance.now();
+
+      // Filter then sort the data (operates on full dataset - very fast)
       let filteredRows = filterRows([...currentRows]);
-      let sortedRows = sortRows(filteredRows);
 
-      // Re-render table
-      resultTableBody.innerHTML = "";
-      let visibleCount = 0;
+      // Apply "show only updated" filter
+      const onlyUpdated = showUpdatedOnlyEl.checked;
+      if (onlyUpdated) {
+        filteredRows = filteredRows.filter(row => row.updated);
+      }
 
-      sortedRows.forEach((row, displayIndex) => {
-        const tr = document.createElement("tr");
-        tr.dataset.rowIndex = currentRows.indexOf(row);
+      processedRows = sortRows(filteredRows);
 
-        if (row.updated) {
-          tr.classList.add("updated-row");
-        }
+      // Show virtual scroll info for large datasets
+      if (processedRows.length > 100) {
+        virtualScrollInfo.style.display = "flex";
+      } else {
+        virtualScrollInfo.style.display = "none";
+      }
 
-        // Check "Show only updated" filter
-        const onlyUpdated = showUpdatedOnlyEl.checked;
-        if (onlyUpdated && !row.updated) {
-          tr.style.display = "none";
-        } else {
-          visibleCount++;
-        }
+      // Render visible rows using virtual scrolling
+      renderVisibleRows();
 
-        const escapeHtml = (str) => {
-          const div = document.createElement("div");
-          div.textContent = str;
-          return div.innerHTML;
-        };
+      // Update filter row count
+      updateFilterRowCount(processedRows.length, currentRows.length, processedRows.length);
+
+      console.log(`Sorting/filtering ${currentRows.length} rows took ${(performance.now() - startTime).toFixed(1)}ms`);
+    }
+
+    // Virtual scroll render - only renders rows visible in viewport
+    function renderVisibleRows(forceRender = false) {
+      if (!processedRows || processedRows.length === 0) {
+        resultTableBody.innerHTML = "";
+        scrollStats.textContent = "No rows to display";
+        return;
+      }
+
+      const containerHeight = tableScrollContainer.clientHeight || 600;
+      const scrollTop = tableScrollContainer.scrollTop;
+
+      // Calculate which rows are visible
+      const rowHeight = VIRTUAL_ROW_HEIGHT;
+      const totalHeight = processedRows.length * rowHeight;
+
+      // Calculate start and end indices with buffer
+      let startIndex = Math.floor(scrollTop / rowHeight) - VIRTUAL_BUFFER;
+      let endIndex = Math.ceil((scrollTop + containerHeight) / rowHeight) + VIRTUAL_BUFFER;
+
+      // Clamp to valid range
+      startIndex = Math.max(0, startIndex);
+      endIndex = Math.min(processedRows.length, endIndex);
+
+      // Build HTML string for visible rows (much faster than DOM manipulation)
+      const rowsHtml = [];
+
+      // Add spacer row at top to maintain scroll position
+      if (startIndex > 0) {
+        rowsHtml.push(`<tr style="height:${startIndex * rowHeight}px;"><td colspan="10"></td></tr>`);
+      }
+
+      // Render only visible rows
+      for (let i = startIndex; i < endIndex; i++) {
+        const row = processedRows[i];
+        const displayIndex = i + 1;
 
         const convDisplay = Number.isNaN(row.convRate)
-          ? escapeHtml(row.convRateStr || "")
+          ? escapeHtmlFast(row.convRateStr || "")
           : (row.convRate.toFixed(2) + "%");
 
         const clicksDisplay = Number.isNaN(row.clicks)
-          ? escapeHtml(row.clicksStr || "")
+          ? escapeHtmlFast(row.clicksStr || "")
           : row.clicks.toString();
 
-        tr.innerHTML = `
-        <td>${displayIndex + 1}</td>
-        <td>${escapeHtml(row.productName)}</td>
-        <td>${escapeHtml(row.campaignName)}</td>
-        <td>${escapeHtml(row.campaignState)}</td>
-        <td>${escapeHtml(row.placement)}</td>
-        <td>${clicksDisplay}</td>
-        <td>${convDisplay}</td>
-        <td>${row.oldPercentage}</td>
-        <td>${escapeHtml(row.percentage)}</td>
-        <td>${escapeHtml(row.campaignId)}</td>
-      `;
-        resultTableBody.appendChild(tr);
-      });
+        const updatedClass = row.updated ? ' class="updated-row"' : '';
 
-      // Update row count
-      updateFilterRowCount(sortedRows.length, currentRows.length, visibleCount);
+        rowsHtml.push(`<tr${updatedClass} data-row-index="${row.originalIndex || row.rowIndex}">
+          <td>${displayIndex}</td>
+          <td>${escapeHtmlFast(row.productName)}</td>
+          <td>${escapeHtmlFast(row.campaignName)}</td>
+          <td>${escapeHtmlFast(row.campaignState)}</td>
+          <td>${escapeHtmlFast(row.placement)}</td>
+          <td>${clicksDisplay}</td>
+          <td>${convDisplay}</td>
+          <td>${row.oldPercentage}</td>
+          <td>${escapeHtmlFast(row.percentage)}</td>
+          <td>${escapeHtmlFast(row.campaignId)}</td>
+        </tr>`);
+      }
+
+      // Add spacer row at bottom to maintain scroll height
+      const remainingRows = processedRows.length - endIndex;
+      if (remainingRows > 0) {
+        rowsHtml.push(`<tr style="height:${remainingRows * rowHeight}px;"><td colspan="10"></td></tr>`);
+      }
+
+      // Bulk update innerHTML (single DOM operation)
+      resultTableBody.innerHTML = rowsHtml.join("");
+
+      // Update scroll stats
+      const visibleStart = Math.max(1, startIndex + 1);
+      const visibleEnd = Math.min(processedRows.length, endIndex);
+      scrollStats.textContent = `Showing rows ${visibleStart.toLocaleString()}-${visibleEnd.toLocaleString()} of ${processedRows.length.toLocaleString()}`;
     }
+
+    // Throttled scroll handler for virtual scrolling
+    function handleTableScroll() {
+      if (renderScheduled) return;
+      renderScheduled = true;
+
+      requestAnimationFrame(() => {
+        renderVisibleRows();
+        renderScheduled = false;
+      });
+    }
+
+    // Attach scroll listener for virtual scrolling
+    tableScrollContainer.addEventListener("scroll", handleTableScroll, { passive: true });
 
     // Sort rows based on current sort column and direction
     function sortRows(rows) {
@@ -1969,8 +2099,8 @@
 
         switch (currentSortColumn) {
           case "rowNumber":
-            valA = currentRows.indexOf(a) + 1;
-            valB = currentRows.indexOf(b) + 1;
+            valA = a.originalIndex || a.rowIndex || 0;
+            valB = b.originalIndex || b.rowIndex || 0;
             break;
           case "productName":
             valA = a.productName || "";
@@ -2034,7 +2164,7 @@
           let actualValue;
           switch (column) {
             case "rowNumber":
-              actualValue = (currentRows.indexOf(row) + 1).toString();
+              actualValue = (row.originalIndex || row.rowIndex || 0).toString();
               break;
             case "productName":
               actualValue = row.productName || "";
@@ -2265,46 +2395,93 @@
         return;
       }
 
-      // First, keep only rows with Operation = "Update" to make file small
-      keepOnlyUpdateOperationRows();
+      // Show generating feedback and disable button
+      const originalText = downloadBtn.innerHTML;
+      downloadBtn.innerHTML = '<span class="loading-dot"></span> Generating...';
+      downloadBtn.disabled = true;
 
-      // Then dedupe the remaining rows
-      dedupeSheetData();
+      // Use setTimeout to allow UI to update before heavy processing
+      setTimeout(() => {
+        try {
+          // Create a copy of globalSheetData to work with (preserve original)
+          let exportData = globalSheetData.map(row => [...row]);
 
-      if (globalIsExcel && globalWorkbook && globalSheetName) {
-        const ws = XLSX.utils.aoa_to_sheet(globalSheetData);
-        globalWorkbook.Sheets[globalSheetName] = ws;
+          // Filter to keep only header + rows with Operation = "Update"
+          if (idxOperation !== -1 && exportData.length > 0) {
+            const filtered = [exportData[0]]; // Keep header
+            for (let i = 1; i < exportData.length; i++) {
+              const opVal = (exportData[i][idxOperation] || "").trim().toLowerCase();
+              if (opVal === "update") {
+                filtered.push(exportData[i]);
+              }
+            }
+            exportData = filtered;
+          }
 
-        const wbout = XLSX.write(globalWorkbook, { bookType: "xlsx", type: "array" });
-        const blob = new Blob([wbout], {
-          type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
-        });
+          // Dedupe the export data
+          const seen = new Set();
+          const deduped = [];
+          for (let i = 0; i < exportData.length; i++) {
+            const row = exportData[i];
+            const key = row.map(cell => (cell == null ? "" : String(cell))).join("\u0001");
+            if (!seen.has(key)) {
+              seen.add(key);
+              deduped.push(row);
+            }
+          }
+          exportData = deduped;
 
-        const url = URL.createObjectURL(blob);
-        const a = document.createElement("a");
-        a.href = url;
-        a.download = "bulk-updated.xlsx";
-        document.body.appendChild(a);
-        a.click();
-        document.body.removeChild(a);
-        URL.revokeObjectURL(url);
-      } else {
-        const lines = globalSheetData.map(row =>
-          row.map(cell => (cell == null ? "" : String(cell))).join(globalDelimiter || "\t")
-        );
-        const text = lines.join("\r\n");
-        const ext = (globalDelimiter === "," ? "csv" : "tsv");
-        const blob = new Blob([text], { type: "text/plain;charset=utf-8;" });
+          if (globalIsExcel && globalWorkbook && globalSheetName) {
+            const ws = XLSX.utils.aoa_to_sheet(exportData);
 
-        const url = URL.createObjectURL(blob);
-        const a = document.createElement("a");
-        a.href = url;
-        a.download = "bulk-updated." + ext;
-        document.body.appendChild(a);
-        a.click();
-        document.body.removeChild(a);
-        URL.revokeObjectURL(url);
-      }
+            // Create a new workbook for export to avoid modifying the original
+            const exportWorkbook = XLSX.utils.book_new();
+            XLSX.utils.book_append_sheet(exportWorkbook, ws, globalSheetName);
+
+            const wbout = XLSX.write(exportWorkbook, { bookType: "xlsx", type: "array" });
+            const blob = new Blob([wbout], {
+              type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+            });
+
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement("a");
+            a.href = url;
+            a.download = "bulk-updated.xlsx";
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+          } else {
+            const lines = exportData.map(row =>
+              row.map(cell => (cell == null ? "" : String(cell))).join(globalDelimiter || "\t")
+            );
+            const text = lines.join("\r\n");
+            const ext = (globalDelimiter === "," ? "csv" : "tsv");
+            const blob = new Blob([text], { type: "text/plain;charset=utf-8;" });
+
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement("a");
+            a.href = url;
+            a.download = "bulk-updated." + ext;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+          }
+
+          // Restore button
+          downloadBtn.innerHTML = originalText;
+          downloadBtn.disabled = false;
+
+        } catch (error) {
+          console.error("Download failed:", error);
+          alert("Download failed: " + error.message + "\n\nPlease try again or contact support if the issue persists.");
+
+          // Restore button on error
+          downloadBtn.innerHTML = originalText;
+          downloadBtn.disabled = false;
+        }
+      }, 50); // Small delay to allow UI update
     });
 
     function escapeHtml(str) {
