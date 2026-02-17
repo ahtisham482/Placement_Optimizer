@@ -856,6 +856,95 @@
         max-height: 400px;
       }
     }
+
+    /* ---------- Debug Panel ---------- */
+    .debug-panel {
+      margin-bottom: 24px;
+    }
+
+    .debug-panel .card-subtitle {
+      margin-bottom: 16px;
+    }
+
+    .debug-chapter {
+      margin-bottom: 12px;
+    }
+
+    .chapter-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      cursor: pointer;
+      user-select: none;
+      transition: filter 0.15s;
+    }
+
+    .chapter-header:hover {
+      filter: brightness(0.97);
+    }
+
+    .chapter-content {
+      display: none;
+      max-height: 500px;
+      overflow-y: auto;
+    }
+
+    .debug-summary-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+      gap: 10px;
+    }
+
+    .debug-stat {
+      background: rgba(255, 255, 255, 0.8);
+      padding: 10px 14px;
+      border-radius: 8px;
+      border: 1px solid rgba(148, 163, 184, 0.3);
+    }
+
+    .debug-stat .stat-label {
+      font-size: 11px;
+      color: #6b7280;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      margin-bottom: 2px;
+    }
+
+    .debug-stat .stat-value {
+      font-size: 18px;
+      font-weight: 700;
+      color: #111827;
+    }
+
+    .debug-table {
+      width: 100%;
+      font-size: 12px;
+      border-collapse: collapse;
+    }
+
+    .debug-table th {
+      text-align: left;
+      padding: 6px 8px;
+      font-size: 10px;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      color: #6b7280;
+      border-bottom: 2px solid rgba(148, 163, 184, 0.3);
+    }
+
+    .debug-table td {
+      padding: 5px 8px;
+      border-bottom: 1px solid rgba(148, 163, 184, 0.15);
+      color: #374151;
+    }
+
+    .debug-decision-badge {
+      display: inline-block;
+      padding: 2px 8px;
+      border-radius: 4px;
+      font-size: 11px;
+      font-weight: 600;
+    }
   </style>
 </head>
 
@@ -1005,6 +1094,114 @@
         <small>(update placement percentages)</small>
       </button>
       <div id="cvrStatus" class="cvr-status" style="display:none;"></div>
+    </div>
+
+    <!-- DEBUG PANEL -->
+    <div class="card debug-panel" id="debugPanel" style="display:none;">
+      <div class="card-header">
+        <div class="card-title">
+          <div class="card-title-dot"><span></span></div>
+          🔍 Debug Summary
+        </div>
+      </div>
+      <div class="card-subtitle">Behind-the-scenes breakdown of every processing step.</div>
+
+      <!-- Chapter 1: File Upload -->
+      <div class="debug-chapter">
+        <div class="chapter-header" onclick="toggleDebugChapter('upload')"
+          style="background:#eff6ff; padding:12px 16px; border-radius:6px; border:1px solid #bfdbfe;">
+          <div style="display:flex; justify-content:space-between; align-items:center; width:100%;">
+            <div>
+              <span style="font-size:15px; font-weight:600; color:#1e40af;">📦 Chapter 1: File Upload Summary</span>
+              <span id="debugUploadCount" style="color:#3b82f6; margin-left:8px; font-size:13px;"></span>
+            </div>
+            <span id="uploadToggle" style="color:#1e40af; font-size:16px;">▼</span>
+          </div>
+        </div>
+        <div class="chapter-content" id="chapterUpload"
+          style="padding:16px; background:white; border:1px solid #bfdbfe; border-top:none; border-radius:0 0 6px 6px;">
+          <div id="debugUploadDetails"></div>
+        </div>
+      </div>
+
+      <!-- Chapter 2: SKU Mapping -->
+      <div class="debug-chapter">
+        <div class="chapter-header" onclick="toggleDebugChapter('sku')"
+          style="background:#f0fdfa; padding:12px 16px; border-radius:6px; border:1px solid #99f6e4;">
+          <div style="display:flex; justify-content:space-between; align-items:center; width:100%;">
+            <div>
+              <span style="font-size:15px; font-weight:600; color:#0f766e;">🔗 Chapter 2: SKU → Product Mapping</span>
+              <span id="debugSkuCount" style="color:#14b8a6; margin-left:8px; font-size:13px;"></span>
+            </div>
+            <span id="skuToggle" style="color:#0f766e; font-size:16px;">▼</span>
+          </div>
+        </div>
+        <div class="chapter-content" id="chapterSku"
+          style="padding:16px; background:white; border:1px solid #99f6e4; border-top:none; border-radius:0 0 6px 6px;">
+          <div id="debugSkuDetails"></div>
+        </div>
+      </div>
+
+      <!-- Chapter 3: CVR Import -->
+      <div class="debug-chapter">
+        <div class="chapter-header" onclick="toggleDebugChapter('cvr')"
+          style="background:#f0fdf4; padding:12px 16px; border-radius:6px; border:1px solid #86efac;">
+          <div style="display:flex; justify-content:space-between; align-items:center; width:100%;">
+            <div>
+              <span style="font-size:15px; font-weight:600; color:#15803d;">📋 Chapter 3: Conversion File Import</span>
+              <span id="debugCvrCount" style="color:#22c55e; margin-left:8px; font-size:13px;"></span>
+            </div>
+            <span id="cvrToggle" style="color:#15803d; font-size:16px;">▼</span>
+          </div>
+        </div>
+        <div class="chapter-content" id="chapterCvr"
+          style="padding:16px; background:white; border:1px solid #86efac; border-top:none; border-radius:0 0 6px 6px;">
+          <div id="debugCvrDetails">
+            <p style="font-size:13px; color:#6b7280; font-style:italic;">No conversion files uploaded yet.</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Chapter 4: Decisions -->
+      <div class="debug-chapter">
+        <div class="chapter-header" onclick="toggleDebugChapter('decisions')"
+          style="background:#faf5ff; padding:12px 16px; border-radius:6px; border:1px solid #d8b4fe;">
+          <div style="display:flex; justify-content:space-between; align-items:center; width:100%;">
+            <div>
+              <span style="font-size:15px; font-weight:600; color:#7c3aed;">⚙️ Chapter 4: Bid Adjustment
+                Decisions</span>
+              <span id="debugDecisionsCount" style="color:#a78bfa; margin-left:8px; font-size:13px;"></span>
+            </div>
+            <span id="decisionsToggle" style="color:#7c3aed; font-size:16px;">▼</span>
+          </div>
+        </div>
+        <div class="chapter-content" id="chapterDecisions"
+          style="padding:16px; background:white; border:1px solid #d8b4fe; border-top:none; border-radius:0 0 6px 6px;">
+          <div id="debugDecisionsDetails">
+            <p style="font-size:13px; color:#6b7280; font-style:italic;">Click "Apply rules" to see decisions.</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Chapter 5: Results Summary -->
+      <div class="debug-chapter">
+        <div class="chapter-header" onclick="toggleDebugChapter('results')"
+          style="background:#ecfdf5; padding:12px 16px; border-radius:6px; border:1px solid #6ee7b7;">
+          <div style="display:flex; justify-content:space-between; align-items:center; width:100%;">
+            <div>
+              <span style="font-size:15px; font-weight:600; color:#047857;">📊 Chapter 5: Results Summary</span>
+              <span id="debugResultsCount" style="color:#10b981; margin-left:8px; font-size:13px;"></span>
+            </div>
+            <span id="resultsToggle" style="color:#047857; font-size:16px;">▼</span>
+          </div>
+        </div>
+        <div class="chapter-content" id="chapterResults"
+          style="padding:16px; background:white; border:1px solid #6ee7b7; border-top:none; border-radius:0 0 6px 6px;">
+          <div id="debugResultsDetails">
+            <p style="font-size:13px; color:#6b7280; font-style:italic;">Click "Apply rules" to see results.</p>
+          </div>
+        </div>
+      </div>
     </div>
 
     <!-- TABLE CARD -->
@@ -1200,6 +1397,12 @@
     // SKU to Product mapping for conversion file linking
     let skuToProductMap = {};  // Maps SKU -> product name
 
+    // Debug mode state
+    let debugFileStats = {};
+    let debugCvrImports = [];  // Array of per-file import logs
+    let debugDecisions = [];   // Array of per-row decisions
+    const debugPanel = document.getElementById('debugPanel');
+
 
     fileInput.addEventListener("change", () => {
       const file = fileInput.files[0];
@@ -1291,6 +1494,11 @@
       renderSummary(rows);
       renderTable(rows);
       renderCvrInputs(rows);
+
+      // Populate debug Chapter 1 (File Upload) & Chapter 2 (SKU Mapping)
+      debugPanel.style.display = 'block';
+      renderDebugChapter1();
+      renderDebugChapter2();
     }
 
     function resetUI() {
@@ -1358,6 +1566,17 @@
         input.classList.remove("has-filter");
       });
       filterControls.style.display = "none";
+
+      // Reset debug panel
+      debugPanel.style.display = 'none';
+      debugFileStats = {};
+      debugCvrImports = [];
+      debugDecisions = [];
+      document.getElementById('debugUploadDetails').innerHTML = '';
+      document.getElementById('debugSkuDetails').innerHTML = '';
+      document.getElementById('debugCvrDetails').innerHTML = '<p style="font-size:13px; color:#6b7280; font-style:italic;">No conversion files uploaded yet.</p>';
+      document.getElementById('debugDecisionsDetails').innerHTML = '<p style="font-size:13px; color:#6b7280; font-style:italic;">Click "Apply rules" to see decisions.</p>';
+      document.getElementById('debugResultsDetails').innerHTML = '<p style="font-size:13px; color:#6b7280; font-style:italic;">Click "Apply rules" to see results.</p>';
     }
 
     function showError(msg) {
@@ -1794,6 +2013,26 @@
 
           // Update overall status
           updateOverallStatus();
+
+          // Debug Chapter 3: Log this CVR import
+          debugCvrImports.push({
+            priority,
+            label: priorityLabels[priority],
+            fileName: file.name,
+            totalSkusParsed: Object.keys(skuCvrMap).length,
+            skippedZero: skippedZeroCount,
+            matchedSkus,
+            newlyFilled: newlyFilledCount,
+            alreadyFilled: Object.keys(productCvrFromFile).length - newlyFilledCount,
+            details: Object.entries(productCvrFromFile).map(([prod, data]) => ({
+              product: prod,
+              cvr: data.cvr.toFixed(2),
+              sku: data.sku,
+              file: priorityLabels[priority],
+              wasFilled: filledProducts.has(prod)
+            }))
+          });
+          renderDebugChapter3();
 
         } catch (err) {
           resultElement.style.display = "block";
@@ -2300,15 +2539,29 @@
       if (!productCvrMap || Object.keys(productCvrMap).length === 0) return;
       if (!globalSheetData) return;
 
+      debugDecisions = [];  // Reset decisions log
+
       currentRows.forEach(row => {
         const target = productCvrMap[row.productName];
-        if (target === undefined || target <= 0) return;
+        if (target === undefined || target <= 0) {
+          // Product skipped (no CVR entered)
+          debugDecisions.push({
+            product: row.productName, campaign: row.campaignName,
+            placement: row.placement, rowCR: row.convRate, targetCR: null,
+            clicks: row.clicks, requiredClicks: null,
+            oldPct: row.oldPercentage, newPct: row.oldPercentage,
+            decision: 'SKIPPED', reason: 'No conversion rate entered for this product'
+          });
+          return;
+        }
 
         const rowCR = row.convRate;
         const clicks = row.clicks;
 
         let oldPct = row.oldPercentage;
         let newPct = oldPct;
+        let decision = 'NO CHANGE';
+        let reason = '';
 
         if (typeof rowCR === "number" && !Number.isNaN(rowCR)) {
           if (rowCR === 0) {
@@ -2319,23 +2572,45 @@
               clicks > requiredClicks) {
               newPct = oldPct - 10;
               if (newPct < 0) newPct = 0;
+              decision = 'DECREASE';
+              reason = `CR=0% but clicks (${clicks}) > required (${requiredClicks.toFixed(1)}), so -10 pts`;
             } else {
               newPct = oldPct;
+              decision = 'NO CHANGE';
+              reason = `CR=0%, clicks (${Number.isNaN(clicks) ? 'N/A' : clicks}) <= required (${requiredClicks.toFixed(1)}), not enough data`;
             }
           } else if (rowCR < target) {
             newPct = oldPct - 10;
             if (newPct < 0) newPct = 0;
+            decision = 'DECREASE';
+            reason = `Row CR (${rowCR.toFixed(2)}%) < Target (${target}%), so -10 pts`;
           } else if (rowCR > target) {
             if (oldPct < 100) {
               newPct = oldPct + 5;
               if (newPct > 100) newPct = 100;
+              decision = 'INCREASE';
+              reason = `Row CR (${rowCR.toFixed(2)}%) > Target (${target}%), so +5 pts`;
             } else {
               newPct = oldPct;
+              decision = 'NO CHANGE';
+              reason = `Row CR (${rowCR.toFixed(2)}%) > Target (${target}%) but already at max (${oldPct}%)`;
             }
           } else {
             newPct = oldPct;
+            decision = 'NO CHANGE';
+            reason = `Row CR (${rowCR.toFixed(2)}%) = Target (${target}%), no adjustment needed`;
           }
+        } else {
+          decision = 'NO CHANGE';
+          reason = 'Conversion rate is not a valid number';
         }
+
+        debugDecisions.push({
+          product: row.productName, campaign: row.campaignName,
+          placement: row.placement, rowCR: rowCR, targetCR: target,
+          clicks: clicks, requiredClicks: rowCR === 0 ? (100 / target) : null,
+          oldPct, newPct, decision, reason
+        });
 
         if (newPct !== oldPct) {
           row.percentage = String(newPct);
@@ -2351,6 +2626,10 @@
           row.updated = false;
         }
       });
+
+      // Render debug Chapter 4 & 5
+      renderDebugChapter4();
+      renderDebugChapter5();
     }
 
     function dedupeSheetData() {
@@ -2483,6 +2762,180 @@
         }
       }, 50); // Small delay to allow UI update
     });
+
+    // ========== DEBUG MODE FUNCTIONS ==========
+
+    function toggleDebugChapter(name) {
+      const chapterMap = { upload: 'Upload', sku: 'Sku', cvr: 'Cvr', decisions: 'Decisions', results: 'Results' };
+      const el = document.getElementById('chapter' + chapterMap[name]);
+      const toggle = document.getElementById(name + 'Toggle');
+      if (!el) return;
+      if (el.style.display === 'block') {
+        el.style.display = 'none';
+        toggle.textContent = '\u25BC';
+      } else {
+        el.style.display = 'block';
+        toggle.textContent = '\u25B2';
+      }
+    }
+
+    function renderDebugChapter1() {
+      const totalRows = globalSheetData ? globalSheetData.length - 1 : 0;
+      const uniqueProducts = new Set(currentRows.map(r => r.productName)).size;
+      const uniqueCampaigns = new Set(currentRows.map(r => r.campaignId || r.campaignName)).size;
+      const skippedRows = debugTotalBidding - debugTotalBiddingEnabled;
+      const skuCount = Object.keys(skuToProductMap).length;
+
+      document.getElementById('debugUploadCount').textContent = `(${totalRows} total rows)`;
+
+      document.getElementById('debugUploadDetails').innerHTML = `
+        <div class="debug-summary-grid">
+          <div class="debug-stat"><div class="stat-label">Total Rows</div><div class="stat-value">${totalRows}</div></div>
+          <div class="debug-stat"><div class="stat-label">Bidding Rows</div><div class="stat-value">${debugTotalBidding}</div></div>
+          <div class="debug-stat"><div class="stat-label">Enabled (kept)</div><div class="stat-value" style="color:#059669;">${debugTotalBiddingEnabled}</div></div>
+          <div class="debug-stat"><div class="stat-label">Paused/Archived</div><div class="stat-value" style="color:#dc2626;">${skippedRows}</div></div>
+          <div class="debug-stat"><div class="stat-label">Unique Products</div><div class="stat-value">${uniqueProducts}</div></div>
+          <div class="debug-stat"><div class="stat-label">Unique Campaigns</div><div class="stat-value">${uniqueCampaigns}</div></div>
+          <div class="debug-stat"><div class="stat-label">SKUs Mapped</div><div class="stat-value">${skuCount}</div></div>
+          <div class="debug-stat"><div class="stat-label">Sheet Used</div><div class="stat-value" style="font-size:13px;">${globalSheetName || 'CSV/TSV'}</div></div>
+        </div>`;
+    }
+
+    function renderDebugChapter2() {
+      const entries = Object.entries(skuToProductMap);
+      document.getElementById('debugSkuCount').textContent = `(${entries.length} SKUs)`;
+
+      if (entries.length === 0) {
+        document.getElementById('debugSkuDetails').innerHTML = '<p style="font-size:13px; color:#6b7280;">No SKU column found in bulk file.</p>';
+        return;
+      }
+
+      let html = '<table class="debug-table"><thead><tr><th>#</th><th>SKU</th><th>Product Name</th></tr></thead><tbody>';
+      entries.forEach(([sku, product], i) => {
+        html += `<tr><td>${i + 1}</td><td style="font-family:monospace; font-size:11px;">${escapeHtmlFast(sku)}</td><td>${escapeHtmlFast(product)}</td></tr>`;
+      });
+      html += '</tbody></table>';
+      document.getElementById('debugSkuDetails').innerHTML = html;
+    }
+
+    function renderDebugChapter3() {
+      if (debugCvrImports.length === 0) return;
+
+      const totalFilled = filledProducts.size;
+      document.getElementById('debugCvrCount').textContent = `(${totalFilled} products filled)`;
+
+      let html = '';
+      debugCvrImports.forEach(imp => {
+        html += `<div style="margin-bottom:16px; padding:12px; background:#f9fafb; border-radius:8px; border:1px solid #e5e7eb;">`;
+        html += `<div style="font-weight:600; margin-bottom:8px; color:#15803d;">\u2460 ${imp.label} File: ${escapeHtmlFast(imp.fileName)}</div>`;
+        html += `<div class="debug-summary-grid" style="margin-bottom:10px;">`;
+        html += `<div class="debug-stat"><div class="stat-label">SKUs Parsed</div><div class="stat-value">${imp.totalSkusParsed}</div></div>`;
+        html += `<div class="debug-stat"><div class="stat-label">0% Skipped</div><div class="stat-value">${imp.skippedZero}</div></div>`;
+        html += `<div class="debug-stat"><div class="stat-label">Matched</div><div class="stat-value">${imp.matchedSkus}</div></div>`;
+        html += `<div class="debug-stat"><div class="stat-label">Newly Filled</div><div class="stat-value" style="color:#059669;">${imp.newlyFilled}</div></div>`;
+        html += `</div>`;
+
+        if (imp.details.length > 0) {
+          html += '<table class="debug-table"><thead><tr><th>Product</th><th>CVR</th><th>Source SKU</th><th>File</th></tr></thead><tbody>';
+          imp.details.forEach(d => {
+            html += `<tr><td>${escapeHtmlFast(d.product)}</td><td>${d.cvr}%</td><td style="font-family:monospace; font-size:11px;">${escapeHtmlFast(d.sku)}</td><td>${d.file}</td></tr>`;
+          });
+          html += '</tbody></table>';
+        }
+        html += '</div>';
+      });
+
+      document.getElementById('debugCvrDetails').innerHTML = html;
+    }
+
+    function renderDebugChapter4() {
+      if (debugDecisions.length === 0) return;
+
+      const increased = debugDecisions.filter(d => d.decision === 'INCREASE').length;
+      const decreased = debugDecisions.filter(d => d.decision === 'DECREASE').length;
+      const noChange = debugDecisions.filter(d => d.decision === 'NO CHANGE').length;
+      const skipped = debugDecisions.filter(d => d.decision === 'SKIPPED').length;
+
+      document.getElementById('debugDecisionsCount').textContent = `(${debugDecisions.length} rows)`;
+
+      const badgeStyle = (decision) => {
+        switch (decision) {
+          case 'INCREASE': return 'background:#dcfce7; color:#166534;';
+          case 'DECREASE': return 'background:#fef2f2; color:#991b1b;';
+          case 'NO CHANGE': return 'background:#f3f4f6; color:#374151;';
+          case 'SKIPPED': return 'background:#fefce8; color:#854d0e;';
+          default: return '';
+        }
+      };
+
+      let html = `<div class="debug-summary-grid" style="margin-bottom:12px;">`;
+      html += `<div class="debug-stat"><div class="stat-label">Increased (+5)</div><div class="stat-value" style="color:#059669;">${increased}</div></div>`;
+      html += `<div class="debug-stat"><div class="stat-label">Decreased (-10)</div><div class="stat-value" style="color:#dc2626;">${decreased}</div></div>`;
+      html += `<div class="debug-stat"><div class="stat-label">No Change</div><div class="stat-value">${noChange}</div></div>`;
+      html += `<div class="debug-stat"><div class="stat-label">Skipped</div><div class="stat-value" style="color:#ca8a04;">${skipped}</div></div>`;
+      html += `</div>`;
+
+      html += '<table class="debug-table"><thead><tr>';
+      html += '<th>#</th><th>Product</th><th>Placement</th><th>Row CR</th><th>Target CR</th><th>Clicks</th><th>Old %</th><th>New %</th><th>Decision</th><th>Reason</th>';
+      html += '</tr></thead><tbody>';
+
+      debugDecisions.forEach((d, i) => {
+        const crDisplay = (typeof d.rowCR === 'number' && !isNaN(d.rowCR)) ? d.rowCR.toFixed(2) + '%' : 'N/A';
+        const targetDisplay = d.targetCR !== null ? d.targetCR + '%' : '—';
+        const clicksDisplay = (typeof d.clicks === 'number' && !isNaN(d.clicks)) ? d.clicks : 'N/A';
+
+        html += `<tr>`;
+        html += `<td>${i + 1}</td>`;
+        html += `<td>${escapeHtmlFast(d.product)}</td>`;
+        html += `<td>${escapeHtmlFast(d.placement)}</td>`;
+        html += `<td>${crDisplay}</td>`;
+        html += `<td>${targetDisplay}</td>`;
+        html += `<td>${clicksDisplay}</td>`;
+        html += `<td>${d.oldPct}</td>`;
+        html += `<td style="font-weight:600;">${d.newPct}</td>`;
+        html += `<td><span class="debug-decision-badge" style="${badgeStyle(d.decision)}">${d.decision}</span></td>`;
+        html += `<td style="font-size:11px; color:#6b7280;">${escapeHtmlFast(d.reason)}</td>`;
+        html += `</tr>`;
+      });
+
+      html += '</tbody></table>';
+      document.getElementById('debugDecisionsDetails').innerHTML = html;
+    }
+
+    function renderDebugChapter5() {
+      if (debugDecisions.length === 0) return;
+
+      const total = debugDecisions.length;
+      const increased = debugDecisions.filter(d => d.decision === 'INCREASE').length;
+      const decreased = debugDecisions.filter(d => d.decision === 'DECREASE').length;
+      const noChange = debugDecisions.filter(d => d.decision === 'NO CHANGE').length;
+      const skipped = debugDecisions.filter(d => d.decision === 'SKIPPED').length;
+      const updated = increased + decreased;
+      const productsWithCvr = Object.keys(productCvrMap).length;
+      const productsSkipped = productList.length - productsWithCvr;
+
+      document.getElementById('debugResultsCount').textContent = `(${updated} updated)`;
+
+      let html = `<div class="debug-summary-grid">`;
+      html += `<div class="debug-stat"><div class="stat-label">Total Rows</div><div class="stat-value">${total}</div></div>`;
+      html += `<div class="debug-stat"><div class="stat-label">Rows Updated</div><div class="stat-value" style="color:#059669;">${updated}</div></div>`;
+      html += `<div class="debug-stat"><div class="stat-label">Rows Unchanged</div><div class="stat-value">${noChange}</div></div>`;
+      html += `<div class="debug-stat"><div class="stat-label">Rows Skipped</div><div class="stat-value" style="color:#ca8a04;">${skipped}</div></div>`;
+      html += `<div class="debug-stat"><div class="stat-label">Products With CVR</div><div class="stat-value">${productsWithCvr}</div></div>`;
+      html += `<div class="debug-stat"><div class="stat-label">Products Skipped</div><div class="stat-value">${productsSkipped}</div></div>`;
+      html += `<div class="debug-stat"><div class="stat-label">Increased (+5)</div><div class="stat-value" style="color:#059669;">${increased}</div></div>`;
+      html += `<div class="debug-stat"><div class="stat-label">Decreased (-10)</div><div class="stat-value" style="color:#dc2626;">${decreased}</div></div>`;
+      html += `</div>`;
+
+      // Download preview
+      html += `<div style="margin-top:12px; padding:10px; background:#eff6ff; border-radius:6px; font-size:13px; color:#1e40af;">`;
+      html += `<strong>Download Preview:</strong> The exported file will contain <strong>${updated}</strong> rows with Operation = "Update".`;
+      html += `</div>`;
+
+      document.getElementById('debugResultsDetails').innerHTML = html;
+    }
+
+    // ========== END DEBUG MODE ==========
 
     function escapeHtml(str) {
       if (typeof str !== "string") return "";
